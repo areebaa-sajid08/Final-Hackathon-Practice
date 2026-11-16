@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import connectDB from "../db/db.js";
 import userModel from "../models/users.model.js";
 
 export async function authenticateToken(req, res, next) {
@@ -9,21 +10,24 @@ export async function authenticateToken(req, res, next) {
         return res.status(401).json({ message: "Authentication required" });
     }
 
+    let payload;
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(payload.id).select("_id role isActive");
-        if (!user || !user.isActive) {
-            return res.status(401).json({ message: "Account is unavailable" });
-        }
-
-        req.user = { id: user.id, role: user.role };
-        return next();
+        payload = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
         if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
             return res.status(401).json({ message: "Invalid or expired token" });
         }
         return next(error);
     }
+
+    await connectDB();
+    const user = await userModel.findById(payload.id).select("_id role isActive");
+    if (!user || !user.isActive) {
+        return res.status(401).json({ message: "Account is unavailable" });
+    }
+
+    req.user = { id: user.id, role: user.role };
+    return next();
 }
 
 export function requireRole(...roles) {

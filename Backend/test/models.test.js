@@ -27,6 +27,12 @@ test("API keeps role-specific routes protected and validates public registration
         headers: { origin: "https://untrusted.example" }
     });
     assert.equal(blockedOrigin.status, 403);
+
+    const hostedOrigin = await fetch(`${base}/api/health`, {
+        headers: { origin: "https://final-hackathon-practice-q631.vercel.app" }
+    });
+    assert.equal(hostedOrigin.status, 200);
+    assert.equal(hostedOrigin.headers.get("access-control-allow-origin"), "https://final-hackathon-practice-q631.vercel.app");
 });
 
 test("user model accepts clinic roles and requires doctor details", async () => {

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import connectDB from "../db/db.js";
 import userModel from "../models/users.model.js";
 
 function escapeRegex(value) {
@@ -6,6 +7,7 @@ function escapeRegex(value) {
 }
 
 export async function getDoctors(req, res) {
+    await connectDB();
     const filter = { role: "doctor", isActive: true };
     const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const specialization = typeof req.query.specialization === "string"
@@ -34,6 +36,7 @@ export async function getDoctorById(req, res) {
         return res.status(400).json({ message: "Invalid doctor id" });
     }
 
+    await connectDB();
     const doctor = await userModel.findOne({
         _id: req.params.id,
         role: "doctor",

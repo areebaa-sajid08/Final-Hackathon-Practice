@@ -10,7 +10,11 @@ Express and MongoDB API for patient registration, doctor appointments, and clini
 4. Create the first admin with `npm run seed:admin`.
 5. Start the API with `npm start`. It listens on port 3000 by default.
 
-For same-site browser deployments, send requests with credentials enabled. Cookies use `SameSite=Lax`; cross-site clients can use the returned JWT as a bearer token. Set `CORS_ORIGINS` to a comma-separated list of trusted frontend origins.
+For same-site browser deployments, send requests with credentials enabled. Cookies use `SameSite=Lax`; cross-site clients can use the returned JWT as a bearer token. The hosted frontend origin is allowlisted by default. `CORS_ORIGINS` can add other trusted origins as a comma-separated list.
+
+### Vercel deployment
+
+Deploy the latest backend source to the Vercel project serving the API. In that project's Environment Variables, set `MONGODB_URI` and `JWT_SECRET`; Vercel does not read the local `.env` file. Set `CORS_ORIGINS` to include `https://final-hackathon-practice-q631.vercel.app`, then redeploy. The checked-in default also includes this frontend origin. Database connections are opened on demand as well as during server startup, so the API works in serverless deployments.
 
 ## API
 

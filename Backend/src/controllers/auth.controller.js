@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import connectDB from "../db/db.js";
 import userModel from "../models/users.model.js";
 
 const publicUserFields = "_id name email role specialization experience isActive createdAt";
@@ -37,6 +38,7 @@ export async function registerUser(req, res) {
         return res.status(400).json({ message: "Password must be between 8 and 128 characters" });
     }
 
+    await connectDB();
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await userModel.create({
         name: name.trim(),
@@ -60,6 +62,7 @@ export async function loginUser(req, res) {
         return res.status(400).json({ message: "Email and password are required" });
     }
 
+    await connectDB();
     const user = await userModel.findOne({ email: email.trim().toLowerCase() })
         .select("+password");
     if (!user || !user.isActive || !await bcrypt.compare(password, user.password)) {
