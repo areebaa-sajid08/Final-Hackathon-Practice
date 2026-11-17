@@ -2,7 +2,8 @@ const labels = {
     pending: "Awaiting review",
     approved: "Confirmed",
     rejected: "Declined",
-    cancelled: "Cancelled"
+    cancelled: "Cancelled",
+    expired: "Expired"
 };
 
 export default function StatusBadge({ status }) {

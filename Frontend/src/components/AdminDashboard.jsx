@@ -114,13 +114,17 @@ export default function AdminDashboard({ user, section }) {
         setMessage("");
         try {
             if (activating) {
-                await api.patch(`/admin/users/${person._id}/activate`, {});
+                const result = await api.patch(`/admin/users/${person._id}/activate`, {});
+                const recovery = result.appointmentRecovery;
+                setMessage(person.role === "doctor" && recovery
+                    ? `Doctor activated. ${recovery.pending} future appointments returned to pending; ${recovery.expired} past appointments marked expired.`
+                    : "Account activated.");
             } else {
                 await api.delete(`/admin/users/${person._id}`);
+                setMessage(person.role === "doctor"
+                    ? "Doctor deactivated. Pending and approved appointments were cancelled."
+                    : "Account deactivated.");
             }
-            setMessage(activating ? "Account activated." : person.role === "doctor"
-                ? "Doctor deactivated. Pending and approved appointments were cancelled."
-                : "Account deactivated.");
             setRefresh(value => value + 1);
         } catch (requestError) {
             setError(requestError.message);
@@ -159,7 +163,7 @@ export default function AdminDashboard({ user, section }) {
                         <div className="content-card-heading"><div><h2>Appointment status</h2><p className="muted">Current totals across the clinic.</p></div></div>
                         {loading ? <div className="loading-state"><span className="spinner" /> Loading clinic stats…</div> : (
                             <div className="status-summary">
-                                {["pending", "approved", "rejected", "cancelled"].map(status => (
+                                {["pending", "approved", "rejected", "cancelled", "expired"].map(status => (
                                     <div className="status-summary-item" key={status}><StatusBadge status={status} /><strong>{appointmentCounts[status] || 0}</strong></div>
                                 ))}
                             </div>
@@ -255,6 +259,7 @@ export default function AdminDashboard({ user, section }) {
                                 <option value="approved">Approved</option>
                                 <option value="rejected">Rejected</option>
                                 <option value="cancelled">Cancelled</option>
+                                <option value="expired">Expired</option>
                             </select>
                         </div>
                     </div>

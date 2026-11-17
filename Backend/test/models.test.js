@@ -9,6 +9,10 @@ import { updateAppointmentStatus } from "../src/controllers/appointments.control
 import appointmentModel from "../src/models/appointments.model.js";
 import userModel from "../src/models/users.model.js";
 import { DEFAULT_DOCTOR_AVAILABILITY, isDoctorAvailable } from "../src/utils/availability.js";
+import {
+    getClinicDateTime,
+    getReactivatedAppointmentStatus
+} from "../src/utils/appointment-recovery.js";
 
 test("login distinguishes inactive accounts from invalid credentials", async () => {
     const password = "correct-password";
@@ -37,6 +41,30 @@ test("doctor availability only allows configured weekdays and times", () => {
     assert.equal(isDoctorAvailable(schedule, "invalid-date", "10:00"), false);
     assert.equal(isDoctorAvailable(undefined, "2030-06-17", "10:00"), true);
     assert.equal(isDoctorAvailable(undefined, "2030-06-22", "10:00"), false);
+});
+
+test("reactivated appointments are classified using the clinic timezone", () => {
+    const now = new Date("2030-06-17T07:00:00.000Z");
+    const appointmentDate = new Date("2030-06-17T00:00:00.000Z");
+
+    assert.deepEqual(getClinicDateTime(now, "Asia/Karachi"), {
+        date: "2030-06-17",
+        time: "12:00:00"
+    });
+    assert.equal(getReactivatedAppointmentStatus(appointmentDate, "11:59", now), "expired");
+    assert.equal(getReactivatedAppointmentStatus(appointmentDate, "12:00", now), "pending");
+    assert.equal(
+        getReactivatedAppointmentStatus(appointmentDate, "12:00", new Date("2030-06-17T07:00:01.000Z")),
+        "expired"
+    );
+    assert.equal(
+        getReactivatedAppointmentStatus(new Date("2030-06-16T00:00:00.000Z"), "23:59", now),
+        "expired"
+    );
+    assert.equal(
+        getReactivatedAppointmentStatus(new Date("2030-06-18T00:00:00.000Z"), "09:00", now),
+        "pending"
+    );
 });
 
 test("doctor cannot reject an appointment without a decline reason", async () => {
@@ -125,6 +153,8 @@ test("appointment model validates slot time and allowed statuses", async () => {
         cancellationReason: "Cancelled because the doctor is not available at this time.",
         rejectionReason: "The doctor is unavailable at the requested time."
     });
+    await appointment.validate();
+    appointment.status = "expired";
     await appointment.validate();
     assert.equal(
         appointment.cancellationReason,

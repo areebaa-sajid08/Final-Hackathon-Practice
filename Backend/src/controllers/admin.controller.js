@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import appointmentModel from "../models/appointments.model.js";
 import userModel from "../models/users.model.js";
+import { DOCTOR_UNAVAILABLE_CANCELLATION_REASON, getReactivatedAppointmentStatus } from "../utils/appointment-recovery.js";
 import { DEFAULT_DOCTOR_AVAILABILITY, WEEKDAYS } from "../utils/availability.js";
 
 const userFields = "_id name email role specialization experience availability isActive createdAt";
@@ -137,7 +138,7 @@ export async function deactivateUser(req, res) {
             {
                 $set: {
                     status: "cancelled",
-                    cancellationReason: "Cancelled because the doctor is not available at this time."
+                    cancellationReason: DOCTOR_UNAVAILABLE_CANCELLATION_REASON
                 }
             }
         );
@@ -151,16 +152,62 @@ export async function activateUser(req, res) {
         return res.status(400).json({ message: "Invalid user id" });
     }
 
-    const user = await userModel.findOneAndUpdate(
-        { _id: req.params.id, role: { $in: ["doctor", "patient"] }, isActive: false },
-        { $set: { isActive: true } },
-        { new: true, runValidators: true }
-    ).select(userFields);
+    const user = await userModel.findOne({
+        _id: req.params.id,
+        role: { $in: ["doctor", "patient"] }
+    }).select(userFields);
 
     if (!user) {
-        return res.status(404).json({ message: "Inactive doctor or patient not found" });
+        return res.status(404).json({ message: "Doctor or patient not found" });
     }
-    return res.status(200).json({ message: "User activated", user });
+
+    const appointmentRecovery = { pending: 0, expired: 0 };
+    if (user.role === "doctor") {
+        const deactivatedAppointments = await appointmentModel.find({
+            doctor: user._id,
+            status: "cancelled",
+            cancellationReason: DOCTOR_UNAVAILABLE_CANCELLATION_REASON
+        }).select("_id appointmentDate appointmentTime").lean();
+
+        const appointmentIds = { pending: [], expired: [] };
+        for (const appointment of deactivatedAppointments) {
+            const status = getReactivatedAppointmentStatus(
+                appointment.appointmentDate,
+                appointment.appointmentTime
+            );
+            appointmentIds[status].push(appointment._id);
+        }
+
+        for (const status of ["pending", "expired"]) {
+            const ids = appointmentIds[status];
+            if (ids.length === 0) continue;
+
+            const result = await appointmentModel.updateMany(
+                {
+                    _id: { $in: ids },
+                    doctor: user._id,
+                    status: "cancelled",
+                    cancellationReason: DOCTOR_UNAVAILABLE_CANCELLATION_REASON
+                },
+                {
+                    $set: { status },
+                    $unset: { cancellationReason: 1 }
+                }
+            );
+            appointmentRecovery[status] = result.modifiedCount;
+        }
+    }
+
+    if (!user.isActive) {
+        user.isActive = true;
+        await user.save();
+    }
+
+    return res.status(200).json({
+        message: "User activated",
+        user,
+        ...(user.role === "doctor" ? { appointmentRecovery } : {})
+    });
 }
 
 export async function getAllAppointments(req, res) {
@@ -181,7 +228,7 @@ export async function getAllAppointments(req, res) {
         filter.patient = { $in: matchingPatients.map(patient => patient.id) };
     }
     if (req.query.status) {
-        if (!["pending", "approved", "rejected", "cancelled"].includes(req.query.status)) {
+        if (!["pending", "approved", "rejected", "cancelled", "expired"].includes(req.query.status)) {
             return res.status(400).json({ message: "Invalid appointment status filter" });
         }
         filter.status = req.query.status;
@@ -214,7 +261,8 @@ export async function getStats(_req, res) {
         pending: 0,
         approved: 0,
         rejected: 0,
-        cancelled: 0
+        cancelled: 0,
+        expired: 0
     };
     for (const item of appointmentCounts) {
         appointments[item._id] = item.count;

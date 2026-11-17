@@ -1465,6 +1465,11 @@ button {
   background: #fbefec;
 }
 
+.status-expired {
+  color: #71818b;
+  background: #edf1f3;
+}
+
 .appointment-actions {
   display: flex;
   gap: 3px;
@@ -1505,7 +1510,7 @@ button {
 
 .status-summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 13px;
 }
 
