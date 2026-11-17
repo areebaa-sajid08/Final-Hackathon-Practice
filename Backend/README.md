@@ -18,7 +18,7 @@ Deploy the latest backend source to the Vercel project serving the API. In that 
 
 ## API
 
-All responses are JSON. Login and registration set an HTTP-only `token` cookie and return a JWT for clients that prefer an `Authorization: Bearer <token>` header. Passwords are never returned.
+All responses are JSON. Login and registration set an HTTP-only `token` cookie and return a JWT for clients that prefer an `Authorization: Bearer <token>` header. Passwords are never returned. Valid credentials for an admin-deactivated account receive HTTP 403 with `Admin deactivated you!`; reactivating the account restores login access.
 
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |

@@ -24,7 +24,9 @@ export default function AuthModal({ mode: initialMode = "login", onClose, onSucc
             });
             onSuccess(result);
         } catch (requestError) {
-            setError(requestError.message);
+            setError(requestError.status === 403 && requestError.message.startsWith("Admin deactivated you!")
+                ? "Admin deactivated you!"
+                : requestError.message);
         } finally {
             setBusy(false);
         }

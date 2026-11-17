@@ -1,12 +1,27 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import test from "node:test";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import app from "../src/app.js";
+import { getLoginStatus } from "../src/controllers/auth.controller.js";
 import { updateAppointmentStatus } from "../src/controllers/appointments.controller.js";
 import appointmentModel from "../src/models/appointments.model.js";
 import userModel from "../src/models/users.model.js";
 import { DEFAULT_DOCTOR_AVAILABILITY, isDoctorAvailable } from "../src/utils/availability.js";
+
+test("login distinguishes inactive accounts from invalid credentials", async () => {
+    const password = "correct-password";
+    const user = {
+        password: await bcrypt.hash(password, 4),
+        isActive: false
+    };
+
+    assert.equal(await getLoginStatus(user, password), "deactivated");
+    assert.equal(await getLoginStatus({ ...user, isActive: true }, password), "active");
+    assert.equal(await getLoginStatus(user, "wrong-password"), "invalid");
+    assert.equal(await getLoginStatus(null, password), "invalid");
+});
 
 test("doctor availability only allows configured weekdays and times", () => {
     const schedule = {

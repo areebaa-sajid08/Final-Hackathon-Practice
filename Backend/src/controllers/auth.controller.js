@@ -56,6 +56,13 @@ export async function registerUser(req, res) {
     });
 }
 
+export async function getLoginStatus(user, password) {
+    if (!user || !await bcrypt.compare(password, user.password)) {
+        return "invalid";
+    }
+    return user.isActive ? "active" : "deactivated";
+}
+
 export async function loginUser(req, res) {
     const { email, password } = req.body || {};
     if (typeof email !== "string" || typeof password !== "string") {
@@ -65,8 +72,12 @@ export async function loginUser(req, res) {
     await connectDB();
     const user = await userModel.findOne({ email: email.trim().toLowerCase() })
         .select("+password");
-    if (!user || !user.isActive || !await bcrypt.compare(password, user.password)) {
+    const loginStatus = await getLoginStatus(user, password);
+    if (loginStatus === "invalid") {
         return res.status(401).json({ message: "Invalid email or password" });
+    }
+    if (loginStatus === "deactivated") {
+        return res.status(403).json({ message: "Admin deactivated you!" });
     }
 
     const token = createToken(user);
