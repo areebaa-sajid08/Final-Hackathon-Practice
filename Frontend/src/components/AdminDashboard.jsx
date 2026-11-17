@@ -4,7 +4,17 @@ import { doctorDisplayName } from "../lib/format.js";
 import Icon from "./Icon.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
-const emptyDoctor = { name: "", email: "", password: "", specialization: "", experience: "" };
+const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const emptyDoctor = {
+    name: "",
+    email: "",
+    password: "",
+    specialization: "",
+    experience: "",
+    availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    startTime: "09:00",
+    endTime: "17:00"
+};
 
 function displayDate(value) {
     if (!value) return "—";
@@ -65,13 +75,26 @@ export default function AdminDashboard({ user, section }) {
 
     async function createDoctor(event) {
         event.preventDefault();
+        if (doctorForm.availableDays.length === 0) {
+            setError("Select at least one available day.");
+            return;
+        }
+        if (doctorForm.startTime >= doctorForm.endTime) {
+            setError("The end time must be later than the start time.");
+            return;
+        }
         setBusy(true);
         setError("");
         setMessage("");
         try {
             await api.post("/admin/doctors", {
                 ...doctorForm,
-                experience: Number(doctorForm.experience)
+                experience: Number(doctorForm.experience),
+                availability: {
+                    availableDays: doctorForm.availableDays,
+                    startTime: doctorForm.startTime,
+                    endTime: doctorForm.endTime
+                }
             });
             setDoctorForm(emptyDoctor);
             setShowDoctorForm(false);
@@ -160,6 +183,28 @@ export default function AdminDashboard({ user, section }) {
                                 <label className="field"><span>Temporary password</span><input type="password" value={doctorForm.password} onChange={event => setDoctorForm(current => ({ ...current, password: event.target.value }))} required minLength={8} maxLength={128} /></label>
                                 <label className="field"><span>Specialization</span><input value={doctorForm.specialization} onChange={event => setDoctorForm(current => ({ ...current, specialization: event.target.value }))} required maxLength={100} placeholder="e.g. Cardiology" /></label>
                                 <label className="field"><span>Years of experience</span><input type="number" min="0" max="80" step="1" value={doctorForm.experience} onChange={event => setDoctorForm(current => ({ ...current, experience: event.target.value }))} required /></label>
+                                <fieldset className="field days-field">
+                                    <legend>Available days</legend>
+                                    <div className="weekday-options">
+                                        {weekdays.map(day => (
+                                            <label className="weekday-option" key={day}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={doctorForm.availableDays.includes(day)}
+                                                    onChange={() => setDoctorForm(current => ({
+                                                        ...current,
+                                                        availableDays: current.availableDays.includes(day)
+                                                            ? current.availableDays.filter(item => item !== day)
+                                                            : [...current.availableDays, day]
+                                                    }))}
+                                                />
+                                                <span>{day.slice(0, 3)}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </fieldset>
+                                <label className="field"><span>Start time</span><input type="time" value={doctorForm.startTime} onChange={event => setDoctorForm(current => ({ ...current, startTime: event.target.value }))} required /></label>
+                                <label className="field"><span>End time</span><input type="time" value={doctorForm.endTime} onChange={event => setDoctorForm(current => ({ ...current, endTime: event.target.value }))} required /></label>
                                 <button className="button button-primary form-submit" type="submit" disabled={busy}>{busy ? "Creating…" : "Create doctor"}</button>
                             </form>
                         </section>

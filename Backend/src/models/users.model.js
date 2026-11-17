@@ -1,5 +1,38 @@
 import mongoose from "mongoose";
 
+const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const defaultAvailableDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+const availabilitySchema = new mongoose.Schema(
+    {
+        availableDays: {
+            type: [{ type: String, enum: weekdays }],
+            default: defaultAvailableDays,
+            validate: {
+                validator: days => days.length > 0,
+                message: "A doctor must be available at least one day a week"
+            }
+        },
+        startTime: {
+            type: String,
+            default: "09:00",
+            match: /^(?:[01]\d|2[0-3]):[0-5]\d$/
+        },
+        endTime: {
+            type: String,
+            default: "17:00",
+            match: /^(?:[01]\d|2[0-3]):[0-5]\d$/,
+            validate: {
+                validator(value) {
+                    return !this.startTime || value > this.startTime;
+                },
+                message: "End time must be later than start time"
+            }
+        }
+    },
+    { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
     {
         name: {
@@ -43,6 +76,15 @@ const userSchema = new mongoose.Schema(
             },
             min: 0,
             max: 80
+        },
+        availability: {
+            type: availabilitySchema,
+            default() {
+                return this.role === "doctor" ? {} : undefined;
+            },
+            required() {
+                return this.role === "doctor";
+            }
         },
         isActive: {
             type: Boolean,

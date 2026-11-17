@@ -5,6 +5,14 @@ function initials(name = "") {
     return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
 }
 
+function scheduleText(availability = {}) {
+    const days = availability.availableDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const shortDays = days.map(day => day.slice(0, 3)).join(", ");
+    const startTime = availability.startTime || "09:00";
+    const endTime = availability.endTime || "17:00";
+    return `${shortDays} · ${startTime}–${endTime}`;
+}
+
 export default function DoctorCard({ doctor, onBook }) {
     return (
         <article className="doctor-card">
@@ -20,6 +28,7 @@ export default function DoctorCard({ doctor, onBook }) {
             </div>
             <div className="doctor-meta">
                 <span><Icon name="activity" size={16} /> {doctor.experience ?? 0} years experience</span>
+                <span className="doctor-hours"><Icon name="clock" size={16} /> {scheduleText(doctor.availability)}</span>
             </div>
             <button
                 className="button button-outline button-wide"

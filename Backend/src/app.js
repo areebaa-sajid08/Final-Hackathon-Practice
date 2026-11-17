@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import helmet from "helmet";
 import adminRoutes from "./routes/admin.routes.js";
 import appointmentRoutes from "./routes/appointments.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -20,6 +21,7 @@ const allowedOrigins = new Set([
         .filter(Boolean)
 ]);
 
+app.use(helmet());
 app.use(cors({
     origin(origin, callback) {
         if (!origin || allowedOrigins.has(origin)) {

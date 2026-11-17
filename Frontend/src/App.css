@@ -755,6 +755,16 @@ button {
   gap: 6px;
 }
 
+.doctor-meta .doctor-hours {
+  margin-top: 7px;
+  color: #6d8578;
+  line-height: 1.4;
+}
+
+.doctor-hours svg {
+  flex: 0 0 auto;
+}
+
 .doctor-meta svg {
   color: #71a184;
 }
@@ -1587,6 +1597,66 @@ button {
   padding-top: 4px;
 }
 
+.days-field {
+  min-width: 0;
+  grid-column: 1 / -1;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.days-field legend {
+  margin-bottom: 8px;
+  color: #637a6d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.weekday-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.weekday-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.days-field .weekday-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.weekday-option span {
+  min-width: 47px;
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe9e2;
+  border-radius: 9px;
+  padding: 0 8px;
+  color: #809188;
+  background: #fff;
+  font-size: 9px;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.weekday-option input:checked + span {
+  border-color: #9dc7ae;
+  color: #34745a;
+  background: #eaf5ed;
+}
+
+.weekday-option input:focus-visible + span {
+  outline: 3px solid rgba(54, 139, 113, 0.28);
+  outline-offset: 2px;
+}
+
 .form-submit {
   align-self: end;
 }
@@ -1622,6 +1692,47 @@ button {
   min-height: 88px;
   resize: vertical;
   padding-top: 10px;
+}
+
+.booking-availability {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid #e4eee6;
+  border-radius: 10px;
+  margin: -7px 0 18px;
+  padding: 10px 12px;
+  color: #6f8c7a;
+  background: #f7faf7;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.booking-availability svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #54896b;
+}
+
+.booking-availability strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #466653;
+  font-size: 9px;
+}
+
+.slot-availability {
+  margin: -3px 0 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.slot-available {
+  color: #3c805d;
+}
+
+.slot-unavailable {
+  color: #ad514b;
 }
 
 .search-field.admin-search {

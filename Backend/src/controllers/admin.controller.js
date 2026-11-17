@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import appointmentModel from "../models/appointments.model.js";
 import userModel from "../models/users.model.js";
+import { DEFAULT_DOCTOR_AVAILABILITY, WEEKDAYS } from "../utils/availability.js";
 
-const userFields = "_id name email role specialization experience isActive createdAt";
+const userFields = "_id name email role specialization experience availability isActive createdAt";
 
 function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -52,7 +53,7 @@ export async function getUsers(req, res) {
 }
 
 export async function createDoctor(req, res) {
-    const { name, email, password, specialization, experience } = req.body || {};
+    const { name, email, password, specialization, experience, availability: requestedAvailability } = req.body || {};
     if (typeof name !== "string" || !name.trim()) {
         return res.status(400).json({ message: "Name is required" });
     }
@@ -69,6 +70,32 @@ export async function createDoctor(req, res) {
     if (!Number.isFinite(years) || years < 0 || years > 80) {
         return res.status(400).json({ message: "Experience must be a number from 0 to 80" });
     }
+    if (requestedAvailability !== undefined && (
+        !requestedAvailability
+        || typeof requestedAvailability !== "object"
+        || Array.isArray(requestedAvailability)
+    )) {
+        return res.status(400).json({ message: "Availability must include availableDays, startTime, and endTime" });
+    }
+
+    const availability = requestedAvailability || DEFAULT_DOCTOR_AVAILABILITY;
+    const availableDays = availability.availableDays ?? DEFAULT_DOCTOR_AVAILABILITY.availableDays;
+    const startTime = availability.startTime ?? DEFAULT_DOCTOR_AVAILABILITY.startTime;
+    const endTime = availability.endTime ?? DEFAULT_DOCTOR_AVAILABILITY.endTime;
+    const validTime = value => typeof value === "string" && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
+    if (
+        !Array.isArray(availableDays)
+        || availableDays.length === 0
+        || availableDays.some(day => !WEEKDAYS.includes(day))
+        || new Set(availableDays).size !== availableDays.length
+        || !validTime(startTime)
+        || !validTime(endTime)
+        || startTime >= endTime
+    ) {
+        return res.status(400).json({
+            message: "Choose at least one valid weekday and an end time later than the start time"
+        });
+    }
 
     const doctor = await userModel.create({
         name: name.trim(),
@@ -76,7 +103,8 @@ export async function createDoctor(req, res) {
         password: await bcrypt.hash(password, 12),
         role: "doctor",
         specialization: specialization.trim(),
-        experience: years
+        experience: years,
+        availability: { availableDays, startTime, endTime }
     });
     return res.status(201).json({
         message: "Doctor account created",

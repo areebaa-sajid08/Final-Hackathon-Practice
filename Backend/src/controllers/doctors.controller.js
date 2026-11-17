@@ -26,7 +26,7 @@ export async function getDoctors(req, res) {
     }
 
     const doctors = await userModel.find(filter)
-        .select("_id name specialization experience isActive")
+        .select("_id name specialization experience availability isActive")
         .sort({ name: 1 });
     return res.status(200).json({ doctors });
 }
@@ -40,7 +40,7 @@ export async function getDoctorById(req, res) {
     const doctor = await userModel.findOne({
         _id: req.params.id,
         role: "doctor"
-    }).select("_id name specialization experience isActive");
+    }).select("_id name specialization experience availability isActive");
 
     if (!doctor) {
         return res.status(404).json({ message: "Doctor not found" });

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import appointmentModel from "../models/appointments.model.js";
 import userModel from "../models/users.model.js";
+import { isDoctorAvailable } from "../utils/availability.js";
 
 function parseAppointmentDate(value) {
     if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -37,9 +38,14 @@ export async function createAppointment(req, res) {
         _id: doctorId,
         role: "doctor",
         isActive: true
-    }).select("_id");
+    }).select("_id availability");
     if (!doctor) {
         return res.status(404).json({ message: "Doctor not found" });
+    }
+    if (!isDoctorAvailable(doctor.availability, appointmentDate, appointmentTime)) {
+        return res.status(400).json({
+            message: "The doctor is not available at the selected day and time"
+        });
     }
 
     const appointment = await appointmentModel.create({
@@ -49,13 +55,13 @@ export async function createAppointment(req, res) {
         appointmentTime,
         reason: reason.trim()
     });
-    await appointment.populate({ path: "doctor", select: "name specialization experience" });
+    await appointment.populate({ path: "doctor", select: "name specialization experience availability" });
     return res.status(201).json({ message: "Appointment requested", appointment });
 }
 
 export async function getMyAppointments(req, res) {
     const appointments = await appointmentModel.find({ patient: req.user.id })
-        .populate({ path: "doctor", select: "name specialization experience" })
+        .populate({ path: "doctor", select: "name specialization experience availability" })
         .sort({ appointmentDate: -1, appointmentTime: 1 });
     return res.status(200).json({ appointments });
 }

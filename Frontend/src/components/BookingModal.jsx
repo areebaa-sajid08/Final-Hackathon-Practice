@@ -9,10 +9,28 @@ function localDateString() {
     return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
+function slotIsAvailable(availability, dateValue, timeValue) {
+    const date = new Date(`${dateValue}T00:00:00`);
+    const day = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+    const days = availability?.availableDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const startTime = availability?.startTime || "09:00";
+    const endTime = availability?.endTime || "17:00";
+    return days.includes(day) && timeValue >= startTime && timeValue < endTime;
+}
+
 export default function BookingModal({ doctor, onClose, onBooked }) {
     const [form, setForm] = useState({ appointmentDate: "", appointmentTime: "", reason: "" });
     const [error, setError] = useState("");
     const [busy, setBusy] = useState(false);
+    const availability = doctor.availability || {
+        availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        startTime: "09:00",
+        endTime: "17:00"
+    };
+    const slotAvailability = form.appointmentDate && form.appointmentTime
+        ? slotIsAvailable(availability, form.appointmentDate, form.appointmentTime)
+        : null;
+    const availabilityDays = availability.availableDays.map(day => day.slice(0, 3)).join(", ");
 
     async function submit(event) {
         event.preventDefault();
@@ -41,6 +59,10 @@ export default function BookingModal({ doctor, onClose, onBooked }) {
                 <p className="eyebrow">REQUEST A VISIT</p>
                 <h2 id="booking-title">Book with {doctorDisplayName(doctor.name)}</h2>
                 <p className="muted modal-intro">{doctor.specialization} · {doctor.experience ?? 0} years experience</p>
+                <div className="booking-availability">
+                    <Icon name="clock" size={16} />
+                    <span><strong>Office hours</strong>{availabilityDays} · {availability.startTime}–{availability.endTime}</span>
+                </div>
                 <form className="form-stack" onSubmit={submit}>
                     <div className="field-pair">
                         <label className="field">
@@ -52,13 +74,20 @@ export default function BookingModal({ doctor, onClose, onBooked }) {
                             <input type="time" value={form.appointmentTime} onChange={event => setForm(current => ({ ...current, appointmentTime: event.target.value }))} required />
                         </label>
                     </div>
+                    {slotAvailability !== null && (
+                        <p className={`slot-availability ${slotAvailability ? "slot-available" : "slot-unavailable"}`} role="status">
+                            {slotAvailability
+                                ? "This doctor is available at the selected time."
+                                : "This doctor is not available on the selected day or time. Choose a time within their office hours."}
+                        </p>
+                    )}
                     <label className="field">
                         <span>Reason for visit</span>
                         <textarea value={form.reason} onChange={event => setForm(current => ({ ...current, reason: event.target.value }))} required maxLength={1000} rows={3} placeholder="What would you like the doctor to know?" />
                     </label>
                     <p className="helper-text">Your request is pending until the doctor reviews it.</p>
                     {error && <p className="form-error" role="alert">{error}</p>}
-                    <button className="button button-primary button-wide" type="submit" disabled={busy}>
+                    <button className="button button-primary button-wide" type="submit" disabled={busy || slotAvailability === false}>
                         {busy ? "Sending request…" : "Request appointment"}
                         {!busy && <Icon name="arrow" size={17} />}
                     </button>
