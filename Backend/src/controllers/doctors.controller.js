@@ -8,7 +8,7 @@ function escapeRegex(value) {
 
 export async function getDoctors(req, res) {
     await connectDB();
-    const filter = { role: "doctor", isActive: true };
+    const filter = { role: "doctor" };
     const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const specialization = typeof req.query.specialization === "string"
         ? req.query.specialization.trim()
@@ -26,7 +26,7 @@ export async function getDoctors(req, res) {
     }
 
     const doctors = await userModel.find(filter)
-        .select("_id name specialization experience")
+        .select("_id name specialization experience isActive")
         .sort({ name: 1 });
     return res.status(200).json({ doctors });
 }
@@ -39,9 +39,8 @@ export async function getDoctorById(req, res) {
     await connectDB();
     const doctor = await userModel.findOne({
         _id: req.params.id,
-        role: "doctor",
-        isActive: true
-    }).select("_id name specialization experience");
+        role: "doctor"
+    }).select("_id name specialization experience isActive");
 
     if (!doctor) {
         return res.status(404).json({ message: "Doctor not found" });

@@ -63,9 +63,14 @@ test("appointment model validates slot time and allowed statuses", async () => {
         appointmentDate: new Date("2030-06-15T00:00:00.000Z"),
         appointmentTime: "09:30",
         reason: "Annual checkup",
-        status: "pending"
+        status: "pending",
+        cancellationReason: "Cancelled because the doctor is not available at this time."
     });
     await appointment.validate();
+    assert.equal(
+        appointment.cancellationReason,
+        "Cancelled because the doctor is not available at this time."
+    );
 
     appointment.appointmentTime = "9:30";
     appointment.status = "confirmed";

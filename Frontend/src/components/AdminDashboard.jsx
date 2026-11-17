@@ -84,13 +84,20 @@ export default function AdminDashboard({ user, section }) {
         }
     }
 
-    async function deactivate(userId, name) {
-        if (!window.confirm(`Deactivate ${name}'s account? Existing appointment history will be kept.`)) return;
+    async function updateUserStatus(person) {
+        const activating = !person.isActive;
+        if (!activating && !window.confirm(`Deactivate ${person.name}'s account? Existing appointment history will be kept.`)) return;
         setError("");
         setMessage("");
         try {
-            await api.delete(`/admin/users/${userId}`);
-            setMessage("Account deactivated.");
+            if (activating) {
+                await api.patch(`/admin/users/${person._id}/activate`, {});
+            } else {
+                await api.delete(`/admin/users/${person._id}`);
+            }
+            setMessage(activating ? "Account activated." : person.role === "doctor"
+                ? "Doctor deactivated. Pending and approved appointments were cancelled."
+                : "Account deactivated.");
             setRefresh(value => value + 1);
         } catch (requestError) {
             setError(requestError.message);
@@ -174,7 +181,15 @@ export default function AdminDashboard({ user, section }) {
                                         <td>{person.email}</td>
                                         <td><span className={`role-chip role-${person.role}`}>{person.role}</span></td>
                                         <td><span className={`account-state ${person.isActive ? "is-active" : "is-inactive"}`}>{person.isActive ? "Active" : "Inactive"}</span></td>
-                                        <td>{person.isActive && person.role !== "admin" && <button className="text-button text-danger" type="button" onClick={() => deactivate(person._id, person.name)}>Deactivate</button>}</td>
+                                        <td>{person.role !== "admin" && (
+                                            <button
+                                                className={`text-button ${person.isActive ? "text-danger" : ""}`}
+                                                type="button"
+                                                onClick={() => updateUserStatus(person)}
+                                            >
+                                                {person.isActive ? "Deactivate" : "Activate"}
+                                            </button>
+                                        )}</td>
                                     </tr>
                                 ))}</tbody>
                             </table></div>
@@ -206,7 +221,10 @@ export default function AdminDashboard({ user, section }) {
                                     <td><strong>{appointment.patient?.name || "Unavailable"}</strong><small>{appointment.patient?.email}</small></td>
                                     <td><strong>{appointment.doctor?.name ? doctorDisplayName(appointment.doctor.name) : "Unavailable"}</strong><small>{appointment.doctor?.specialization}</small></td>
                                     <td>{displayDate(appointment.appointmentDate)}<small>{appointment.appointmentTime}</small></td>
-                                    <td className="reason-cell">{appointment.reason}</td>
+                                    <td className="reason-cell">
+                                        {appointment.reason}
+                                        {appointment.cancellationReason && <small className="admin-cancellation-note">{appointment.cancellationReason}</small>}
+                                    </td>
                                     <td><StatusBadge status={appointment.status} /></td>
                                 </tr>
                             ))}</tbody>

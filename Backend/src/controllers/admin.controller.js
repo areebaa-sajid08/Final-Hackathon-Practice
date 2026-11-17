@@ -88,16 +88,51 @@ export async function deactivateUser(req, res) {
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(400).json({ message: "Invalid user id" });
     }
+
+    const user = await userModel.findOne({
+        _id: req.params.id,
+        role: { $in: ["doctor", "patient"] }
+    }).select(userFields);
+
+    if (!user) {
+        return res.status(404).json({ message: "Doctor or patient not found" });
+    }
+
+    if (user.isActive) {
+        user.isActive = false;
+        await user.save();
+    }
+
+    if (user.role === "doctor") {
+        await appointmentModel.updateMany(
+            { doctor: user._id, status: { $in: ["pending", "approved"] } },
+            {
+                $set: {
+                    status: "cancelled",
+                    cancellationReason: "Cancelled because the doctor is not available at this time."
+                }
+            }
+        );
+    }
+
+    return res.status(200).json({ message: "User deactivated", user });
+}
+
+export async function activateUser(req, res) {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({ message: "Invalid user id" });
+    }
+
     const user = await userModel.findOneAndUpdate(
-        { _id: req.params.id, role: { $in: ["doctor", "patient"] }, isActive: true },
-        { $set: { isActive: false } },
+        { _id: req.params.id, role: { $in: ["doctor", "patient"] }, isActive: false },
+        { $set: { isActive: true } },
         { new: true, runValidators: true }
     ).select(userFields);
 
     if (!user) {
-        return res.status(404).json({ message: "Active doctor or patient not found" });
+        return res.status(404).json({ message: "Inactive doctor or patient not found" });
     }
-    return res.status(200).json({ message: "User deactivated", user });
+    return res.status(200).json({ message: "User activated", user });
 }
 
 export async function getAllAppointments(req, res) {

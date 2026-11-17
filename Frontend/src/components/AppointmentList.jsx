@@ -49,7 +49,11 @@ export default function AppointmentList({ appointments = [], role, onCancel, onS
                                 <span><Icon name="clock" size={15} /> {appointment.appointmentTime}</span>
                                 <span><Icon name="calendar" size={15} /> {date.full}</span>
                             </div>
-                            {appointment.reason && <p className="appointment-reason">{appointment.reason}</p>}
+                            {role === "patient" && appointment.cancellationReason ? (
+                                <p className="appointment-cancellation">{appointment.cancellationReason}</p>
+                            ) : appointment.reason ? (
+                                <p className="appointment-reason">{appointment.reason}</p>
+                            ) : null}
                         </div>
                         {role === "doctor" && appointment.status === "pending" && (
                             <div className="appointment-actions">

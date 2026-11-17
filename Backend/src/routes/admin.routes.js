@@ -1,6 +1,7 @@
 import express from "express";
 import {
     createDoctor,
+    activateUser,
     deactivateUser,
     getAllAppointments,
     getStats,
@@ -14,6 +15,7 @@ router.use(authenticateToken, requireRole("admin"));
 router.get("/users", getUsers);
 router.post("/doctors", createDoctor);
 router.delete("/users/:id", deactivateUser);
+router.patch("/users/:id/activate", activateUser);
 router.get("/appointments", getAllAppointments);
 router.get("/stats", getStats);
 
