@@ -6,6 +6,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import appointmentRoutes from "./routes/appointments.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import doctorRoutes from "./routes/doctors.routes.js";
+import notificationRoutes from "./routes/notifications.routes.js";
 
 const app = express();
 const defaultOrigins = [
@@ -40,6 +41,7 @@ app.get("/api/health", (_req, res) => res.status(200).json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));

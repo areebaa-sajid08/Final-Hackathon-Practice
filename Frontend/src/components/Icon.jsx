@@ -1,6 +1,7 @@
 const icons = {
     activity: <><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></>,
     arrow: <><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></>,
+    bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></>,
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 11h18" /></>,
     check: <path d="m5 12 4 4L19 6" />,
     chevron: <path d="m9 18 6-6-6-6" />,

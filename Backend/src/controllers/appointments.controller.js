@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import appointmentModel from "../models/appointments.model.js";
+import notificationModel from "../models/notifications.model.js";
 import userModel from "../models/users.model.js";
 import { isDoctorAvailable } from "../utils/availability.js";
 
@@ -55,6 +56,14 @@ export async function createAppointment(req, res) {
         appointmentTime,
         reason: reason.trim()
     });
+    const date = appointment.appointmentDate.toISOString().slice(0, 10);
+    await notificationModel.create({
+        recipient: doctor._id,
+        appointment: appointment._id,
+        type: "appointment_requested",
+        title: "New appointment request",
+        message: `A patient requested an appointment for ${date} at ${appointmentTime}.`
+    });
     await appointment.populate({ path: "doctor", select: "name specialization experience availability" });
     return res.status(201).json({ message: "Appointment requested", appointment });
 }
@@ -108,6 +117,17 @@ export async function updateAppointmentStatus(req, res) {
         }
         return res.status(409).json({ message: "Only pending appointments can be updated" });
     }
+    const date = appointment.appointmentDate.toISOString().slice(0, 10);
+    const approved = status === "approved";
+    await notificationModel.create({
+        recipient: appointment.patient._id,
+        appointment: appointment._id,
+        type: approved ? "appointment_approved" : "appointment_declined",
+        title: approved ? "Appointment approved" : "Appointment declined",
+        message: approved
+            ? `Your appointment for ${date} at ${appointment.appointmentTime} was approved.`
+            : `Your appointment for ${date} at ${appointment.appointmentTime} was declined. Reason: ${rejectionReason.trim()}`
+    });
     return res.status(200).json({ message: `Appointment ${status}`, appointment });
 }
 

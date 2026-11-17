@@ -7,6 +7,7 @@ import app from "../src/app.js";
 import { getLoginStatus } from "../src/controllers/auth.controller.js";
 import { updateAppointmentStatus } from "../src/controllers/appointments.controller.js";
 import appointmentModel from "../src/models/appointments.model.js";
+import notificationModel from "../src/models/notifications.model.js";
 import userModel from "../src/models/users.model.js";
 import { DEFAULT_DOCTOR_AVAILABILITY, isDoctorAvailable } from "../src/utils/availability.js";
 import {
@@ -99,6 +100,8 @@ test("API keeps role-specific routes protected and validates public registration
     assert.equal(healthResponse.status, 200);
     assert.equal(healthResponse.headers.get("x-content-type-options"), "nosniff");
     assert.equal((await fetch(`${base}/api/appointments/my`)).status, 401);
+    assert.equal((await fetch(`${base}/api/notifications`)).status, 401);
+    assert.equal((await fetch(`${base}/api/notifications/read-all`, { method: "PATCH" })).status, 401);
     assert.equal((await fetch(`${base}/api/admin/stats`)).status, 401);
 
     const invalidRegistration = await fetch(`${base}/api/auth/register`, {
@@ -140,6 +143,22 @@ test("user model accepts clinic roles and requires doctor details", async () => 
     assert.ok(error.errors.specialization);
     assert.ok(error.errors.experience);
     assert.deepEqual(doctor.availability.availableDays, DEFAULT_DOCTOR_AVAILABILITY.availableDays);
+});
+
+test("notification model validates recipient, appointment, and event type", async () => {
+    const notification = new notificationModel({
+        recipient: new mongoose.Types.ObjectId(),
+        appointment: new mongoose.Types.ObjectId(),
+        type: "appointment_requested",
+        title: "New appointment request",
+        message: "A patient requested an appointment."
+    });
+    await notification.validate();
+    assert.equal(notification.readAt, null);
+
+    notification.type = "appointment_cancelled";
+    const error = await notification.validate().then(() => null, validationError => validationError);
+    assert.ok(error.errors.type);
 });
 
 test("appointment model validates slot time and allowed statuses", async () => {

@@ -33,6 +33,9 @@ All responses are JSON. Login and registration set an HTTP-only `token` cookie a
 | PATCH | `/api/appointments/:id/cancel` | Patient | Cancel a pending appointment |
 | GET | `/api/appointments/doctor` | Doctor | List appointments assigned to the signed-in doctor |
 | PATCH | `/api/appointments/:id/status` | Assigned doctor | Set a pending appointment to `approved`, or `rejected` with a required `rejectionReason` (for example, `{ "status": "rejected", "rejectionReason": "Unavailable at the requested time" }`) |
+| GET | `/api/notifications` | Signed-in user | Get the latest 30 notifications and unread count |
+| PATCH | `/api/notifications/:id/read` | Signed-in user | Mark one of the user's notifications as read |
+| PATCH | `/api/notifications/read-all` | Signed-in user | Mark all of the user's notifications as read |
 | GET | `/api/admin/users` | Admin | List users; optional `role`, `search`, `page`, and `limit` filters |
 | POST | `/api/admin/doctors` | Admin | Create a doctor (`name`, `email`, `password`, `specialization`, `experience`, and `availability: { availableDays, startTime, endTime }`) |
 | DELETE | `/api/admin/users/:id` | Admin | Deactivate a doctor or patient while retaining appointment history; pending/approved doctor appointments are cancelled |
@@ -42,3 +45,5 @@ All responses are JSON. Login and registration set an HTTP-only `token` cookie a
 | GET | `/api/health` | Public | Health check |
 
 Public registration always creates a patient; doctor accounts are created by admins, and admin accounts are provisioned with the seed command. Doctor availability uses weekday names and 24-hour times, for example `{ "availableDays": ["Monday", "Wednesday"], "startTime": "09:00", "endTime": "17:00" }`. Existing doctors and older create requests default to Monday-Friday, 09:00-17:00. Booking requests outside a doctor's schedule are rejected by the API. `CLINIC_TIME_ZONE` controls past-appointment checks and defaults to `Asia/Karachi`. When a doctor is reactivated, only appointments cancelled because that doctor was deactivated are recovered: upcoming appointments return to `pending`, and past appointments become `expired`; their deactivation cancellation note is removed. Helmet adds standard security headers to API responses. Patients can only access their own appointments, and doctors can only update appointments assigned to them. Pending and approved appointments reserve a doctor's date/time slot. Doctors must provide a decline reason; patients can see it on their appointment. Deactivated doctors remain visible in the directory as unavailable; their pending and approved appointments are cancelled with a cancellation reason.
+
+Appointment requests create a notification for the assigned doctor; approvals and declines create notifications for the patient, including a decline reason when applicable. Notifications are stored for later sign-in, and the portal refreshes them every 30 seconds.

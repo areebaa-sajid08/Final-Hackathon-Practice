@@ -5,6 +5,7 @@ import BookingModal from "./components/BookingModal.jsx";
 import DoctorDashboard from "./components/DoctorDashboard.jsx";
 import DoctorDirectory from "./components/DoctorDirectory.jsx";
 import Icon from "./components/Icon.jsx";
+import NotificationCenter from "./components/NotificationCenter.jsx";
 import PatientDashboard from "./components/PatientDashboard.jsx";
 import { api, clearToken, getToken, setToken } from "./lib/api.js";
 import "./App.css";
@@ -252,7 +253,13 @@ export default function App() {
             <div className="portal-main">
                 <header className="portal-topbar">
                     <div className="breadcrumb"><span>Carewell</span><Icon name="chevron" size={15} /><strong>{activeView === "overview" ? "Overview" : activeView === "doctors" ? "Find a doctor" : activeView === "users" ? "People" : "Appointments"}</strong></div>
-                    <div className="portal-top-actions"><span className="secure-label"><Icon name="shield" size={16} /> Secure patient portal</span><span className="top-avatar">{user.name?.[0]?.toUpperCase() || "C"}</span></div>
+                    <div className="portal-top-actions">
+                        {user.role !== "admin" && (
+                            <NotificationCenter onOpenAppointments={() => setActiveView(isPatient ? "appointments" : "overview")} />
+                        )}
+                        <span className="secure-label"><Icon name="shield" size={16} /> Secure patient portal</span>
+                        <span className="top-avatar">{user.name?.[0]?.toUpperCase() || "C"}</span>
+                    </div>
                 </header>
                 <main className="portal-content">
                     {isPatient && activeView === "doctors" ? (
