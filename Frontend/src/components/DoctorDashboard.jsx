@@ -3,6 +3,7 @@ import { api } from "../lib/api.js";
 import AppointmentList from "./AppointmentList.jsx";
 import DeclineReasonModal from "./DeclineReasonModal.jsx";
 import Icon from "./Icon.jsx";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 
 export default function DoctorDashboard({ user }) {
     const [appointments, setAppointments] = useState([]);
@@ -76,7 +77,7 @@ export default function DoctorDashboard({ user }) {
                 </div>
                 {error && <p className="form-error" role="alert">{error}</p>}
                 {actionError && <p className="form-error" role="alert">{actionError}</p>}
-                {loading ? <div className="loading-state"><span className="spinner" /> Loading appointments…</div> : (
+                {loading ? <div className="loading-state"><LoadingIndicator message="Loading appointments…" /></div> : (
                     <AppointmentList appointments={appointments} role="doctor" onStatus={setStatus} />
                 )}
             </section>

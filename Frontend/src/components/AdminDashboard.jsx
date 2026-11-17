@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { doctorDisplayName } from "../lib/format.js";
 import Icon from "./Icon.jsx";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -161,7 +162,7 @@ export default function AdminDashboard({ user, section }) {
                     </div>
                     <section className="content-card">
                         <div className="content-card-heading"><div><h2>Appointment status</h2><p className="muted">Current totals across the clinic.</p></div></div>
-                        {loading ? <div className="loading-state"><span className="spinner" /> Loading clinic stats…</div> : (
+                        {loading ? <div className="loading-state"><LoadingIndicator message="Loading clinic stats…" /></div> : (
                             <div className="status-summary">
                                 {["pending", "approved", "rejected", "cancelled", "expired"].map(status => (
                                     <div className="status-summary-item" key={status}><StatusBadge status={status} /><strong>{appointmentCounts[status] || 0}</strong></div>
@@ -221,7 +222,7 @@ export default function AdminDashboard({ user, section }) {
                                 <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search name or email" aria-label="Search users" />
                             </form>
                         </div>
-                        {loading ? <div className="loading-state"><span className="spinner" /> Loading people…</div> : users.length ? (
+                        {loading ? <div className="loading-state"><LoadingIndicator message="Loading people…" /></div> : users.length ? (
                             <div className="table-scroll"><table className="data-table">
                                 <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Account</th><th /></tr></thead>
                                 <tbody>{users.map(person => (
@@ -263,7 +264,7 @@ export default function AdminDashboard({ user, section }) {
                             </select>
                         </div>
                     </div>
-                    {loading ? <div className="loading-state"><span className="spinner" /> Loading appointments…</div> : appointments.length ? (
+                    {loading ? <div className="loading-state"><LoadingIndicator message="Loading appointments…" /></div> : appointments.length ? (
                         <div className="table-scroll"><table className="data-table">
                             <thead><tr><th>Patient</th><th>Doctor</th><th>Date & time</th><th>Reason</th><th>Status</th></tr></thead>
                             <tbody>{appointments.map(appointment => (

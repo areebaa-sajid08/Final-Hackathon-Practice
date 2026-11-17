@@ -1,23 +1,16 @@
 import { useEffect, useState } from "react";
 import AdminDashboard from "./components/AdminDashboard.jsx";
 import AuthModal from "./components/AuthModal.jsx";
+import Brand from "./components/Brand.jsx";
 import BookingModal from "./components/BookingModal.jsx";
 import DoctorDashboard from "./components/DoctorDashboard.jsx";
 import DoctorDirectory from "./components/DoctorDirectory.jsx";
 import Icon from "./components/Icon.jsx";
+import LoadingIndicator from "./components/LoadingIndicator.jsx";
 import NotificationCenter from "./components/NotificationCenter.jsx";
 import PatientDashboard from "./components/PatientDashboard.jsx";
 import { api, clearToken, getToken, setToken } from "./lib/api.js";
 import "./App.css";
-
-function Brand({ compact = false }) {
-    return (
-        <span className={`brand ${compact ? "brand-compact" : ""}`}>
-            <span className="brand-mark"><Icon name="heart" size={18} /></span>
-            <span>carewell<span className="brand-period">.</span></span>
-        </span>
-    );
-}
 
 function PublicHeader({ onLogin, onRegister, onDoctors, onHome, active }) {
     return (
@@ -211,7 +204,7 @@ export default function App() {
     }
 
     if (sessionLoading) {
-        return <div className="full-page-loading"><span className="spinner" /> Opening your clinic workspace…</div>;
+        return <div className="full-page-loading"><LoadingIndicator message="Opening your clinic workspace…" /></div>;
     }
 
     if (!user) {

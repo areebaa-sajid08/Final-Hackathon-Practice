@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import AppointmentList from "./AppointmentList.jsx";
 import Icon from "./Icon.jsx";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 import NotificationCenter from "./NotificationCenter.jsx";
 
 export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) {
@@ -68,7 +69,7 @@ export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) 
                 </div>
                 {error && <p className="form-error" role="alert">{error}</p>}
                 {actionError && <p className="form-error" role="alert">{actionError}</p>}
-                {loading ? <div className="loading-state"><span className="spinner" /> Loading appointments…</div> : (
+                {loading ? <div className="loading-state"><LoadingIndicator message="Loading appointments…" /></div> : (
                     <AppointmentList appointments={appointments} role="patient" onCancel={cancelAppointment} />
                 )}
             </section>

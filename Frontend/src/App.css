@@ -63,6 +63,28 @@ button {
   box-shadow: 0 5px 12px rgba(39, 114, 95, 0.18);
 }
 
+.brand-loading .brand-mark {
+  animation: brand-loading-pulse 1.35s ease-in-out infinite;
+}
+
+@keyframes brand-loading-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 5px 12px rgba(39, 114, 95, 0.18);
+  }
+  50% {
+    transform: scale(1.07);
+    box-shadow: 0 7px 17px rgba(39, 114, 95, 0.29);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-loading .brand-mark {
+    animation: none;
+  }
+}
+
 .brand-period {
   color: #6ca789;
 }
@@ -784,17 +806,20 @@ button {
   font-size: 12px;
 }
 
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d7e7dc;
-  border-top-color: #42836b;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.loading-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.loading-indicator .brand {
+  flex: 0 0 auto;
+  color: #355c49;
+}
+
+.loading-indicator-message {
+  color: #82948e;
+  font-size: 11px;
 }
 
 .api-error {
@@ -1454,10 +1479,9 @@ button {
   font-size: 12px;
 }
 
-.notification-empty .spinner {
-  width: 19px;
-  height: 19px;
-  margin-bottom: 2px;
+.notification-empty .loading-indicator {
+  flex-direction: column;
+  gap: 8px;
 }
 
 .notification-empty-icon {

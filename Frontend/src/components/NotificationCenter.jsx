@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import Icon from "./Icon.jsx";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 
 function formatCreatedAt(value) {
     const date = new Date(value);
@@ -114,7 +115,7 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                     </header>
                     {error && <p className="notification-error" role="alert">{error}</p>}
                     {loading ? (
-                        <p className="notification-empty"><span className="spinner" /> Loading notifications…</p>
+                        <div className="notification-empty"><LoadingIndicator message="Loading notifications…" /></div>
                     ) : notifications.length === 0 ? (
                         <div className="notification-empty">
                             <span className="notification-empty-icon"><Icon name="bell" size={19} /></span>

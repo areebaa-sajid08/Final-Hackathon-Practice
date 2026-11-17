@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import DoctorCard from "./DoctorCard.jsx";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 import Icon from "./Icon.jsx";
 
 export default function DoctorDirectory({ search, setSearch, onBook, fullPage = false }) {
@@ -60,7 +61,7 @@ export default function DoctorDirectory({ search, setSearch, onBook, fullPage = 
             )}
 
             {loading ? (
-                <div className="loading-state"><span className="spinner" /> Loading doctors…</div>
+                <div className="loading-state"><LoadingIndicator message="Loading doctors…" /></div>
             ) : doctors.length ? (
                 <div className="doctor-grid">
                     {doctors.map(doctor => <DoctorCard key={doctor._id} doctor={doctor} onBook={onBook} />)}
