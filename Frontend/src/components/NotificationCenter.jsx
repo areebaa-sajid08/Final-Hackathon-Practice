@@ -7,6 +7,12 @@ function formatCreatedAt(value) {
     return Number.isNaN(date.getTime()) ? "Recently" : date.toLocaleString();
 }
 
+function getNotificationIcon(type) {
+    if (type === "appointment_approved") return "check";
+    if (type === "appointment_declined") return "close";
+    return "calendar";
+}
+
 export default function NotificationCenter({ inline = false, onOpenAppointments }) {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -93,19 +99,28 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                     aria-label="Notifications"
                 >
                     <header className="notification-panel-header">
-                        <div>
-                            <h2>Notifications</h2>
-                            <p>{unreadCount ? `${unreadCount} unread` : "You're all caught up"}</p>
+                        <div className="notification-heading">
+                            <span className="notification-heading-icon"><Icon name="bell" size={18} /></span>
+                            <span>
+                                <h2>Notifications</h2>
+                                <p>{unreadCount ? `${unreadCount} unread` : "You're all caught up"}</p>
+                            </span>
                         </div>
                         {unreadCount > 0 && (
-                            <button className="text-button" type="button" onClick={markAllRead}>Mark all read</button>
+                            <button className="notification-mark-all" type="button" onClick={markAllRead}>
+                                <Icon name="check" size={14} /> Mark all read
+                            </button>
                         )}
                     </header>
                     {error && <p className="notification-error" role="alert">{error}</p>}
                     {loading ? (
-                        <p className="notification-empty">Loading notifications…</p>
+                        <p className="notification-empty"><span className="spinner" /> Loading notifications…</p>
                     ) : notifications.length === 0 ? (
-                        <p className="notification-empty">Appointment updates will appear here.</p>
+                        <div className="notification-empty">
+                            <span className="notification-empty-icon"><Icon name="bell" size={19} /></span>
+                            <strong>Nothing to catch up on</strong>
+                            <span>Appointment updates will appear here.</span>
+                        </div>
                     ) : (
                         <div className="notification-list">
                             {notifications.map(notification => (
@@ -115,12 +130,17 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                                     type="button"
                                     onClick={() => openNotification(notification)}
                                 >
-                                    <span className="notification-item-heading">
-                                        <strong>{notification.title}</strong>
-                                        {!notification.readAt && <span className="notification-unread-dot" />}
+                                    <span className={`notification-type-icon ${notification.type}`}>
+                                        <Icon name={getNotificationIcon(notification.type)} size={16} />
                                     </span>
-                                    <span className="notification-message">{notification.message}</span>
-                                    <span className="notification-date">{formatCreatedAt(notification.createdAt)}</span>
+                                    <span className="notification-item-content">
+                                        <span className="notification-item-heading">
+                                            <strong>{notification.title}</strong>
+                                            {!notification.readAt && <span className="notification-new-label">NEW</span>}
+                                        </span>
+                                        <span className="notification-message">{notification.message}</span>
+                                        <span className="notification-date">{formatCreatedAt(notification.createdAt)}</span>
+                                    </span>
                                 </button>
                             ))}
                         </div>
