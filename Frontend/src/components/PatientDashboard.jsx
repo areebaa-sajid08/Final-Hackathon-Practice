@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import AppointmentList from "./AppointmentList.jsx";
 import Icon from "./Icon.jsx";
+import NotificationCenter from "./NotificationCenter.jsx";
 
 export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) {
     const [appointments, setAppointments] = useState([]);
@@ -54,6 +55,10 @@ export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) 
                 <div className="stat-card"><div className="stat-icon mint"><Icon name="calendar" /></div><div><span>Total visits</span><strong>{loading ? "—" : appointments.length}</strong></div></div>
                 <div className="stat-card"><div className="stat-icon amber"><Icon name="clock" /></div><div><span>Awaiting review</span><strong>{loading ? "—" : pending}</strong></div></div>
                 <div className="stat-card"><div className="stat-icon blue"><Icon name="check" /></div><div><span>Confirmed</span><strong>{loading ? "—" : confirmed}</strong></div></div>
+            </div>
+
+            <div className="content-card notification-feed-card">
+                <NotificationCenter inline />
             </div>
 
             <section className="content-card">

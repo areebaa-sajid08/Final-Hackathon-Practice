@@ -254,7 +254,7 @@ export default function App() {
                 <header className="portal-topbar">
                     <div className="breadcrumb"><span>Carewell</span><Icon name="chevron" size={15} /><strong>{activeView === "overview" ? "Overview" : activeView === "doctors" ? "Find a doctor" : activeView === "users" ? "People" : "Appointments"}</strong></div>
                     <div className="portal-top-actions">
-                        {user.role !== "admin" && (
+                        {user.role !== "admin" && (!isPatient || activeView === "doctors") && (
                             <NotificationCenter onOpenAppointments={() => setActiveView(isPatient ? "appointments" : "overview")} />
                         )}
                         <span className="secure-label"><Icon name="shield" size={16} /> Secure patient portal</span>

@@ -7,7 +7,7 @@ function formatCreatedAt(value) {
     return Number.isNaN(date.getTime()) ? "Recently" : date.toLocaleString();
 }
 
-export default function NotificationCenter({ onOpenAppointments }) {
+export default function NotificationCenter({ inline = false, onOpenAppointments }) {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [open, setOpen] = useState(false);
@@ -58,7 +58,7 @@ export default function NotificationCenter({ onOpenAppointments }) {
             }
         }
         setOpen(false);
-        onOpenAppointments();
+        onOpenAppointments?.();
     }
 
     async function markAllRead() {
@@ -74,19 +74,24 @@ export default function NotificationCenter({ onOpenAppointments }) {
     }
 
     return (
-        <div className="notification-center">
-            <button
-                className="notification-trigger"
-                type="button"
-                aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"}
-                aria-expanded={open}
-                onClick={() => setOpen(current => !current)}
-            >
-                <Icon name="bell" size={19} />
-                {unreadCount > 0 && <span className="notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
-            </button>
-            {open && (
-                <section className="notification-panel" aria-label="Notifications">
+        <div className={`notification-center ${inline ? "notification-center-inline" : ""}`}>
+            {!inline && (
+                <button
+                    className="notification-trigger"
+                    type="button"
+                    aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"}
+                    aria-expanded={open}
+                    onClick={() => setOpen(current => !current)}
+                >
+                    <Icon name="bell" size={19} />
+                    {unreadCount > 0 && <span className="notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+                </button>
+            )}
+            {(open || inline) && (
+                <section
+                    className={`notification-panel ${inline ? "notification-panel-inline" : ""}`}
+                    aria-label="Notifications"
+                >
                     <header className="notification-panel-header">
                         <div>
                             <h2>Notifications</h2>
