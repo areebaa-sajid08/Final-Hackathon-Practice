@@ -817,11 +817,6 @@ button {
   color: #355c49;
 }
 
-.loading-indicator-message {
-  color: #82948e;
-  font-size: 11px;
-}
-
 .api-error {
   display: flex;
   align-items: center;

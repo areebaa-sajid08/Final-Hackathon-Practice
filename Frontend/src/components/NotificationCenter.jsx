@@ -115,7 +115,7 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                     </header>
                     {error && <p className="notification-error" role="alert">{error}</p>}
                     {loading ? (
-                        <div className="notification-empty"><LoadingIndicator message="Loading notifications…" /></div>
+                        <div className="notification-empty"><LoadingIndicator /></div>
                     ) : notifications.length === 0 ? (
                         <div className="notification-empty">
                             <span className="notification-empty-icon"><Icon name="bell" size={19} /></span>

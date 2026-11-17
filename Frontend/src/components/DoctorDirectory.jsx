@@ -61,7 +61,7 @@ export default function DoctorDirectory({ search, setSearch, onBook, fullPage = 
             )}
 
             {loading ? (
-                <div className="loading-state"><LoadingIndicator message="Loading doctors…" /></div>
+                <div className="loading-state"><LoadingIndicator /></div>
             ) : doctors.length ? (
                 <div className="doctor-grid">
                     {doctors.map(doctor => <DoctorCard key={doctor._id} doctor={doctor} onBook={onBook} />)}

@@ -204,7 +204,7 @@ export default function App() {
     }
 
     if (sessionLoading) {
-        return <div className="full-page-loading"><LoadingIndicator message="Opening your clinic workspace…" /></div>;
+        return <div className="full-page-loading"><LoadingIndicator /></div>;
     }
 
     if (!user) {

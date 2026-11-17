@@ -69,7 +69,7 @@ export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) 
                 </div>
                 {error && <p className="form-error" role="alert">{error}</p>}
                 {actionError && <p className="form-error" role="alert">{actionError}</p>}
-                {loading ? <div className="loading-state"><LoadingIndicator message="Loading appointments…" /></div> : (
+                {loading ? <div className="loading-state"><LoadingIndicator /></div> : (
                     <AppointmentList appointments={appointments} role="patient" onCancel={cancelAppointment} />
                 )}
             </section>

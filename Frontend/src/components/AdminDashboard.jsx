@@ -162,7 +162,7 @@ export default function AdminDashboard({ user, section }) {
                     </div>
                     <section className="content-card">
                         <div className="content-card-heading"><div><h2>Appointment status</h2><p className="muted">Current totals across the clinic.</p></div></div>
-                        {loading ? <div className="loading-state"><LoadingIndicator message="Loading clinic stats…" /></div> : (
+                        {loading ? <div className="loading-state"><LoadingIndicator /></div> : (
                             <div className="status-summary">
                                 {["pending", "approved", "rejected", "cancelled", "expired"].map(status => (
                                     <div className="status-summary-item" key={status}><StatusBadge status={status} /><strong>{appointmentCounts[status] || 0}</strong></div>
@@ -222,7 +222,7 @@ export default function AdminDashboard({ user, section }) {
                                 <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search name or email" aria-label="Search users" />
                             </form>
                         </div>
-                        {loading ? <div className="loading-state"><LoadingIndicator message="Loading people…" /></div> : users.length ? (
+                        {loading ? <div className="loading-state"><LoadingIndicator /></div> : users.length ? (
                             <div className="table-scroll"><table className="data-table">
                                 <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Account</th><th /></tr></thead>
                                 <tbody>{users.map(person => (
@@ -264,7 +264,7 @@ export default function AdminDashboard({ user, section }) {
                             </select>
                         </div>
                     </div>
-                    {loading ? <div className="loading-state"><LoadingIndicator message="Loading appointments…" /></div> : appointments.length ? (
+                    {loading ? <div className="loading-state"><LoadingIndicator /></div> : appointments.length ? (
                         <div className="table-scroll"><table className="data-table">
                             <thead><tr><th>Patient</th><th>Doctor</th><th>Date & time</th><th>Reason</th><th>Status</th></tr></thead>
                             <tbody>{appointments.map(appointment => (
