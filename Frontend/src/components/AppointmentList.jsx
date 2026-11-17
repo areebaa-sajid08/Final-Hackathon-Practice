@@ -51,6 +51,10 @@ export default function AppointmentList({ appointments = [], role, onCancel, onS
                             </div>
                             {role === "patient" && appointment.cancellationReason ? (
                                 <p className="appointment-cancellation">{appointment.cancellationReason}</p>
+                            ) : role === "patient" && appointment.status === "rejected" && appointment.rejectionReason ? (
+                                <p className="appointment-decline-reason">
+                                    <strong>Reason for decline:</strong> {appointment.rejectionReason}
+                                </p>
                             ) : appointment.reason ? (
                                 <p className="appointment-reason">{appointment.reason}</p>
                             ) : null}

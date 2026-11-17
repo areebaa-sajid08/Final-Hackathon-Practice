@@ -32,6 +32,11 @@ const appointmentSchema = new mongoose.Schema(
             trim: true,
             maxlength: 300
         },
+        rejectionReason: {
+            type: String,
+            trim: true,
+            maxlength: 1000
+        },
         status: {
             type: String,
             enum: ["pending", "approved", "rejected", "cancelled"],

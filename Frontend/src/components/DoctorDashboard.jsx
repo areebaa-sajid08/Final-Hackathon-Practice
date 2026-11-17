@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import AppointmentList from "./AppointmentList.jsx";
+import DeclineReasonModal from "./DeclineReasonModal.jsx";
 import Icon from "./Icon.jsx";
 
 export default function DoctorDashboard({ user }) {
@@ -8,6 +9,7 @@ export default function DoctorDashboard({ user }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [actionError, setActionError] = useState("");
+    const [decliningAppointment, setDecliningAppointment] = useState(null);
 
     useEffect(() => {
         let current = true;
@@ -23,6 +25,10 @@ export default function DoctorDashboard({ user }) {
     }, []);
 
     async function setStatus(id, status) {
+        if (status === "rejected") {
+            setDecliningAppointment(appointments.find(appointment => appointment._id === id) || null);
+            return;
+        }
         setActionError("");
         try {
             const result = await api.patch(`/appointments/${id}/status`, { status });
@@ -32,6 +38,17 @@ export default function DoctorDashboard({ user }) {
         } catch (requestError) {
             setActionError(requestError.message);
         }
+    }
+
+    async function declineAppointment(rejectionReason) {
+        const result = await api.patch(
+            `/appointments/${decliningAppointment._id}/status`,
+            { status: "rejected", rejectionReason }
+        );
+        setAppointments(current => current.map(appointment => (
+            appointment._id === decliningAppointment._id ? result.appointment : appointment
+        )));
+        setDecliningAppointment(null);
     }
 
     const pending = appointments.filter(item => item.status === "pending").length;
@@ -63,6 +80,13 @@ export default function DoctorDashboard({ user }) {
                     <AppointmentList appointments={appointments} role="doctor" onStatus={setStatus} />
                 )}
             </section>
+            {decliningAppointment && (
+                <DeclineReasonModal
+                    patientName={decliningAppointment.patient?.name}
+                    onClose={() => setDecliningAppointment(null)}
+                    onSubmit={declineAppointment}
+                />
+            )}
         </div>
     );
 }

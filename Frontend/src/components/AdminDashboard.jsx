@@ -224,6 +224,7 @@ export default function AdminDashboard({ user, section }) {
                                     <td className="reason-cell">
                                         {appointment.reason}
                                         {appointment.cancellationReason && <small className="admin-cancellation-note">{appointment.cancellationReason}</small>}
+                                        {appointment.rejectionReason && <small className="admin-decline-note">Declined: {appointment.rejectionReason}</small>}
                                     </td>
                                     <td><StatusBadge status={appointment.status} /></td>
                                 </tr>

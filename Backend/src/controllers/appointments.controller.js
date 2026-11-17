@@ -68,17 +68,27 @@ export async function getDoctorAppointments(req, res) {
 }
 
 export async function updateAppointmentStatus(req, res) {
-    const { status } = req.body || {};
+    const { status, rejectionReason } = req.body || {};
     if (!["approved", "rejected"].includes(status)) {
         return res.status(400).json({ message: "Status must be approved or rejected" });
+    }
+    if (status === "rejected" && (
+        typeof rejectionReason !== "string"
+        || !rejectionReason.trim()
+        || rejectionReason.trim().length > 1000
+    )) {
+        return res.status(400).json({ message: "A decline reason is required and must be 1000 characters or fewer" });
     }
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(400).json({ message: "Invalid appointment id" });
     }
 
+    const update = status === "rejected"
+        ? { $set: { status, rejectionReason: rejectionReason.trim() } }
+        : { $set: { status }, $unset: { rejectionReason: 1 } };
     const appointment = await appointmentModel.findOneAndUpdate(
         { _id: req.params.id, doctor: req.user.id, status: "pending" },
-        { $set: { status } },
+        update,
         { new: true, runValidators: true }
     ).populate({ path: "patient", select: "name email" });
 

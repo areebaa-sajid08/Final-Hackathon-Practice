@@ -1408,6 +1408,22 @@ button {
   line-height: 1.55;
 }
 
+.appointment-main .appointment-decline-reason {
+  max-width: 500px;
+  margin-top: 9px;
+  border-left: 2px solid #d5a35b;
+  border-radius: 0 6px 6px 0;
+  padding: 7px 9px;
+  color: #806b4e;
+  background: #fbf6ed;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.appointment-decline-reason strong {
+  color: #705a3c;
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -1854,6 +1870,22 @@ button {
   margin: -4px 0 0;
   color: #8a9a91;
   font-size: 9px;
+}
+
+.decline-mark {
+  color: #a1655c;
+  background: #fbefec;
+}
+
+.decline-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 4px;
+}
+
+.admin-decline-note {
+  color: #806b4e !important;
 }
 
 .success-modal {

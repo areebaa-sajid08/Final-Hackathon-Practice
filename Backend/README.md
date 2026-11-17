@@ -32,7 +32,7 @@ All responses are JSON. Login and registration set an HTTP-only `token` cookie a
 | GET | `/api/appointments/my` | Patient | List the signed-in patient's appointments |
 | PATCH | `/api/appointments/:id/cancel` | Patient | Cancel a pending appointment |
 | GET | `/api/appointments/doctor` | Doctor | List appointments assigned to the signed-in doctor |
-| PATCH | `/api/appointments/:id/status` | Assigned doctor | Set a pending appointment to `approved` or `rejected` |
+| PATCH | `/api/appointments/:id/status` | Assigned doctor | Set a pending appointment to `approved`, or `rejected` with a required `rejectionReason` (for example, `{ "status": "rejected", "rejectionReason": "Unavailable at the requested time" }`) |
 | GET | `/api/admin/users` | Admin | List users; optional `role`, `search`, `page`, and `limit` filters |
 | POST | `/api/admin/doctors` | Admin | Create a doctor (`name`, `email`, `password`, `specialization`, `experience`) |
 | DELETE | `/api/admin/users/:id` | Admin | Deactivate a doctor or patient while retaining appointment history; pending/approved doctor appointments are cancelled |
@@ -41,4 +41,4 @@ All responses are JSON. Login and registration set an HTTP-only `token` cookie a
 | GET | `/api/admin/stats` | Admin | Get patient, doctor, and appointment totals |
 | GET | `/api/health` | Public | Health check |
 
-Public registration always creates a patient; doctor accounts are created by admins, and admin accounts are provisioned with the seed command. Patients can only access their own appointments, and doctors can only update appointments assigned to them. Pending and approved appointments reserve a doctor's date/time slot. Deactivated doctors remain visible in the directory as unavailable; their pending and approved appointments are cancelled with a cancellation reason. Reactivating a doctor does not restore previously cancelled appointments.
+Public registration always creates a patient; doctor accounts are created by admins, and admin accounts are provisioned with the seed command. Patients can only access their own appointments, and doctors can only update appointments assigned to them. Pending and approved appointments reserve a doctor's date/time slot. Doctors must provide a decline reason; patients can see it on their appointment. Deactivated doctors remain visible in the directory as unavailable; their pending and approved appointments are cancelled with a cancellation reason. Reactivating a doctor does not restore previously cancelled appointments.

@@ -3,8 +3,31 @@ import { once } from "node:events";
 import test from "node:test";
 import mongoose from "mongoose";
 import app from "../src/app.js";
+import { updateAppointmentStatus } from "../src/controllers/appointments.controller.js";
 import appointmentModel from "../src/models/appointments.model.js";
 import userModel from "../src/models/users.model.js";
+
+test("doctor cannot reject an appointment without a decline reason", async () => {
+    const response = {
+        statusCode: 0,
+        status(code) {
+            this.statusCode = code;
+            return this;
+        },
+        json(body) {
+            this.body = body;
+            return this;
+        }
+    };
+
+    await updateAppointmentStatus(
+        { body: { status: "rejected" }, params: { id: "invalid-id" }, user: { id: "doctor-id" } },
+        response
+    );
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.body.message, /decline reason is required/i);
+});
 
 test("API keeps role-specific routes protected and validates public registration", async t => {
     const server = app.listen(0, "127.0.0.1");
@@ -64,13 +87,15 @@ test("appointment model validates slot time and allowed statuses", async () => {
         appointmentTime: "09:30",
         reason: "Annual checkup",
         status: "pending",
-        cancellationReason: "Cancelled because the doctor is not available at this time."
+        cancellationReason: "Cancelled because the doctor is not available at this time.",
+        rejectionReason: "The doctor is unavailable at the requested time."
     });
     await appointment.validate();
     assert.equal(
         appointment.cancellationReason,
         "Cancelled because the doctor is not available at this time."
     );
+    assert.equal(appointment.rejectionReason, "The doctor is unavailable at the requested time.");
 
     appointment.appointmentTime = "9:30";
     appointment.status = "confirmed";
