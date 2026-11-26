@@ -1,16 +1,23 @@
-# React + Vite
+# Carewell Clinic Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Responsive React frontend for the clinic appointment system, built with Vite and Tailwind CSS v4.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev
+```
 
-## React Compiler
+## Validation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm run lint
+npm run build
+```
 
-## Expanding the ESLint configuration
+## Styling
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Tailwind CSS v4 is integrated through `@tailwindcss/vite`. Global Tailwind setup is in `src/index.css`; component and page styling uses Tailwind utility classes. Interactive depth and transforms use CSS utilities and honor reduced-motion preferences for loading animation.
+
+Set `VITE_API_BASE_URL` to the clinic API base URL when using a non-default backend. The default is `https://final-hackathon-practice.vercel.app/api`.

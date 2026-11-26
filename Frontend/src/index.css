@@ -1,47 +1,38 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
 
-:root {
-  font-family: "DM Sans", "Segoe UI", sans-serif;
-  color: #233b36;
-  background: #f5f8f6;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
-  font-weight: 400;
+@theme {
+  --font-sans: "DM Sans", "Segoe UI", sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    @apply box-border;
+  }
 
-body {
-  min-width: 360px;
-  min-height: 100vh;
-  margin: 0;
-}
+  html {
+    @apply scroll-smooth;
+  }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
+  body {
+    @apply m-0 min-h-screen min-w-[320px] bg-[#f5f9f6] font-sans antialiased text-slate-800;
+  }
 
-button {
-  cursor: pointer;
-}
+  button,
+  input,
+  textarea,
+  select {
+    @apply font-sans;
+  }
 
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 3px solid rgba(54, 139, 113, 0.28);
-  outline-offset: 2px;
-}
+  button {
+    @apply cursor-pointer;
+  }
 
-::selection {
-  color: #fff;
-  background: #317d68;
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-emerald-600;
+  }
+
+  ::selection {
+    @apply bg-emerald-700 text-white;
+  }
 }
