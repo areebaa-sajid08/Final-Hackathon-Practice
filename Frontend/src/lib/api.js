@@ -22,7 +22,8 @@ async function request(path, options = {}) {
     if (token) {
         headers.set("Authorization", `Bearer ${token}`);
     }
-    if (options.body !== undefined) {
+    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+    if (options.body !== undefined && !isFormData) {
         headers.set("Content-Type", "application/json");
     }
 
@@ -55,6 +56,7 @@ async function request(path, options = {}) {
 export const api = {
     get: path => request(path),
     post: (path, body) => request(path, { method: "POST", body: JSON.stringify(body) }),
+    postForm: (path, body) => request(path, { method: "POST", body }),
     patch: (path, body) => request(path, { method: "PATCH", body: JSON.stringify(body) }),
     delete: path => request(path, { method: "DELETE" })
 };

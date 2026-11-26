@@ -1,9 +1,6 @@
 import Icon from "./Icon.jsx";
 import { doctorDisplayName } from "../lib/format.js";
-
-function initials(name = "") {
-    return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
-}
+import ProfileAvatar from "./ProfileAvatar.jsx";
 
 function scheduleText(availability = {}) {
     const days = availability.availableDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -18,7 +15,7 @@ export default function DoctorCard({ doctor, onBook }) {
         <article className="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur transition duration-300 hover:-translate-y-2 hover:rotate-1 hover:shadow-2xl hover:shadow-emerald-950/10 sm:p-6">
             <div className="pointer-events-none absolute -right-10 -top-12 size-36 rounded-full bg-gradient-to-br from-emerald-100 to-teal-50 blur-2xl transition duration-500 group-hover:scale-150" />
             <div className="relative flex items-start justify-between gap-3">
-                <div className="grid size-16 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-800 text-lg font-black text-white shadow-xl shadow-emerald-900/20 transition duration-300 group-hover:rotate-3 group-hover:scale-105">{initials(doctor.name)}</div>
+                <div className="transition duration-300 group-hover:rotate-3 group-hover:scale-105"><ProfileAvatar name={doctor.name} imageUrl={doctor.profileImage} /></div>
                 <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold ${doctor.isActive === false ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-800"}`}>
                     <span className={`size-1.5 rounded-full ${doctor.isActive === false ? "bg-rose-500" : "bg-emerald-500"}`} />
                     {doctor.isActive === false ? "Not available" : "Active profile"}

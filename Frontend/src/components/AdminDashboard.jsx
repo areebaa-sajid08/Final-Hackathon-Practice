@@ -4,6 +4,7 @@ import { doctorDisplayName } from "../lib/format.js";
 import Icon from "./Icon.jsx";
 import LoadingIndicator from "./LoadingIndicator.jsx";
 import PasswordInput from "./PasswordInput.jsx";
+import ProfileAvatar from "./ProfileAvatar.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -55,8 +56,15 @@ export default function AdminDashboard({ user, section }) {
     const [statusFilter, setStatusFilter] = useState("");
     const [showDoctorForm, setShowDoctorForm] = useState(false);
     const [doctorForm, setDoctorForm] = useState(emptyDoctor);
+    const [doctorImage, setDoctorImage] = useState(null);
+    const [doctorImagePreview, setDoctorImagePreview] = useState("");
     const [busy, setBusy] = useState(false);
     const [refresh, setRefresh] = useState(0);
+
+    useEffect(() => {
+        if (!doctorImagePreview) return undefined;
+        return () => URL.revokeObjectURL(doctorImagePreview);
+    }, [doctorImagePreview]);
 
     useEffect(() => {
         let current = true;
@@ -106,16 +114,22 @@ export default function AdminDashboard({ user, section }) {
         setError("");
         setMessage("");
         try {
-            await api.post("/admin/doctors", {
-                ...doctorForm,
-                experience: Number(doctorForm.experience),
-                availability: {
-                    availableDays: doctorForm.availableDays,
-                    startTime: doctorForm.startTime,
-                    endTime: doctorForm.endTime
-                }
-            });
+            const formData = new FormData();
+            formData.append("name", doctorForm.name);
+            formData.append("email", doctorForm.email);
+            formData.append("password", doctorForm.password);
+            formData.append("specialization", doctorForm.specialization);
+            formData.append("experience", String(Number(doctorForm.experience)));
+            formData.append("availability", JSON.stringify({
+                availableDays: doctorForm.availableDays,
+                startTime: doctorForm.startTime,
+                endTime: doctorForm.endTime
+            }));
+            if (doctorImage) formData.append("image", doctorImage);
+            await api.postForm("/admin/doctors", formData);
             setDoctorForm(emptyDoctor);
+            setDoctorImage(null);
+            setDoctorImagePreview("");
             setShowDoctorForm(false);
             setMessage("Doctor account created.");
             setRefresh(value => value + 1);
@@ -212,6 +226,40 @@ export default function AdminDashboard({ user, section }) {
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Temporary password<PasswordInput className="py-3" value={doctorForm.password} onChange={event => setDoctorForm(current => ({ ...current, password: event.target.value }))} required minLength={8} maxLength={128} autoComplete="new-password" /></label>
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Specialization<input className={fieldClass} value={doctorForm.specialization} onChange={event => setDoctorForm(current => ({ ...current, specialization: event.target.value }))} required maxLength={100} placeholder="e.g. Cardiology" /></label>
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Years of experience<input className={fieldClass} type="number" min="0" max="80" step="1" value={doctorForm.experience} onChange={event => setDoctorForm(current => ({ ...current, experience: event.target.value }))} required /></label>
+                                <label className="grid gap-2 text-xs font-bold text-emerald-950 sm:col-span-2 xl:col-span-3">
+                                    <span>Profile picture <span className="font-normal text-slate-400">(optional · JPG, PNG, or WebP · max 5 MB)</span></span>
+                                    <span className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-emerald-900/20 bg-emerald-50/40 p-4 sm:flex-row sm:items-center">
+                                        {doctorImagePreview
+                                            ? <img className="size-20 shrink-0 rounded-2xl object-cover shadow-lg" src={doctorImagePreview} alt="Doctor profile preview" />
+                                            : <span className="grid size-20 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700 shadow-sm"><Icon name="doctor" size={30} /></span>}
+                                        <input
+                                            className="block w-full text-xs text-slate-600 file:mr-3 file:rounded-xl file:border-0 file:bg-emerald-700 file:px-4 file:py-2.5 file:text-xs file:font-bold file:text-white hover:file:bg-emerald-800"
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            onChange={event => {
+                                                const file = event.target.files?.[0] || null;
+                                                if (file && !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                                                    setDoctorImage(null);
+                                                    setDoctorImagePreview("");
+                                                    setError("Choose a JPEG, PNG, or WebP profile picture.");
+                                                    event.target.value = "";
+                                                    return;
+                                                }
+                                                if (file && file.size > 5 * 1024 * 1024) {
+                                                    setDoctorImage(null);
+                                                    setDoctorImagePreview("");
+                                                    setError("Profile picture must be 5 MB or smaller.");
+                                                    event.target.value = "";
+                                                    return;
+                                                }
+                                                setError("");
+                                                setDoctorImage(file);
+                                                setDoctorImagePreview(file ? URL.createObjectURL(file) : "");
+                                            }}
+                                        />
+                                        {doctorImage && <span className="break-all text-[11px] font-medium text-emerald-800">{doctorImage.name}</span>}
+                                    </span>
+                                </label>
                                 <fieldset className="grid gap-2 text-xs font-bold text-emerald-950 sm:col-span-2 xl:col-span-3">
                                     <legend>Available days</legend>
                                     <div className="flex flex-wrap gap-2">
@@ -245,7 +293,7 @@ export default function AdminDashboard({ user, section }) {
                                     <thead className="text-[10px] uppercase tracking-wider text-slate-400"><tr>{["Name", "Email", "Role", "Account", ""].map(head => <th className="border-b border-emerald-950/5 px-3 py-3 font-bold" key={head || "actions"}>{head}</th>)}</tr></thead>
                                     <tbody>{users.map(person => (
                                         <tr className="transition hover:bg-emerald-50/40" key={person._id}>
-                                            <td className="border-b border-emerald-950/5 px-3 py-4"><strong className="text-emerald-950">{person.name}</strong>{person.specialization && <small className="mt-1 block text-slate-400">{person.specialization}</small>}</td>
+                                            <td className="border-b border-emerald-950/5 px-3 py-4"><div className="flex items-center gap-3"><ProfileAvatar name={person.name} imageUrl={person.role === "doctor" ? person.profileImage : ""} size="table" /><span><strong className="text-emerald-950">{person.name}</strong>{person.specialization && <small className="mt-1 block text-slate-400">{person.specialization}</small>}</span></div></td>
                                             <td className="border-b border-emerald-950/5 px-3 py-4 text-slate-600">{person.email}</td>
                                             <td className="border-b border-emerald-950/5 px-3 py-4"><span className="rounded-full bg-teal-50 px-2.5 py-1 text-[10px] font-bold capitalize text-teal-800">{person.role}</span></td>
                                             <td className="border-b border-emerald-950/5 px-3 py-4"><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${person.isActive ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-500"}`}>{person.isActive ? "Active" : "Inactive"}</span></td>
