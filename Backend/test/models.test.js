@@ -91,6 +91,28 @@ test("doctor cannot reject an appointment without a decline reason", async () =>
     assert.match(response.body.message, /decline reason is required/i);
 });
 
+test("completed status passes request validation before appointment lookup", async () => {
+    const response = {
+        statusCode: 0,
+        status(code) {
+            this.statusCode = code;
+            return this;
+        },
+        json(body) {
+            this.body = body;
+            return this;
+        }
+    };
+
+    await updateAppointmentStatus(
+        { body: { status: "completed" }, params: { id: "invalid-id" }, user: { id: "doctor-id" } },
+        response
+    );
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.body.message, /invalid appointment id/i);
+});
+
 test("API keeps role-specific routes protected and validates public registration", async t => {
     const server = app.listen(0, "127.0.0.1");
     await once(server, "listening");
@@ -182,6 +204,8 @@ test("notification model validates recipient, appointment, and event type", asyn
     notification.type = "appointment_cancelled";
     const error = await notification.validate().then(() => null, validationError => validationError);
     assert.ok(error.errors.type);
+    notification.type = "appointment_completed";
+    await notification.validate();
 });
 
 test("appointment model validates slot time and allowed statuses", async () => {
@@ -197,6 +221,8 @@ test("appointment model validates slot time and allowed statuses", async () => {
     });
     await appointment.validate();
     appointment.status = "expired";
+    await appointment.validate();
+    appointment.status = "completed";
     await appointment.validate();
     assert.equal(
         appointment.cancellationReason,

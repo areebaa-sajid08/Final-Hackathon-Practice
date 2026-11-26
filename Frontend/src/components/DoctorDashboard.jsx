@@ -83,10 +83,11 @@ export default function DoctorDashboard({ user }) {
                     <ProfileAvatar name={user.name} imageUrl={user.profileImage} size="table" /> Doctor account
                 </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard icon="calendar" label="Total requests" value={loading ? "—" : appointments.length} tone="emerald" />
                 <StatCard icon="clock" label="Need your review" value={loading ? "—" : pending} tone="amber" />
                 <StatCard icon="check" label="Approved visits" value={loading ? "—" : approved} tone="blue" />
+                <StatCard icon="check" label="Completed visits" value={loading ? "—" : appointments.filter(item => item.status === "completed").length} tone="emerald" />
             </div>
             <section className="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur dark:border-white/10 dark:bg-slate-900/80 sm:p-7">
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

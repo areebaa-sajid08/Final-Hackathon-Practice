@@ -18,7 +18,8 @@ function setAuthCookie(res, token) {
     res.cookie("token", token, {
         httpOnly: true,
         secure: production,
-        sameSite: "lax",
+        sameSite: production ? "none" : "lax",
+        path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 }
@@ -94,7 +95,8 @@ export async function logoutUser(_req, res) {
     res.clearCookie("token", {
         httpOnly: true,
         secure: production,
-        sameSite: "lax"
+        sameSite: production ? "none" : "lax",
+        path: "/"
     });
     return res.status(200).json({ message: "Logged out successfully" });
 }

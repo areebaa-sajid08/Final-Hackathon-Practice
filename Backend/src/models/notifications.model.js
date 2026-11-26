@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ["appointment_requested", "appointment_approved", "appointment_declined"],
+            enum: ["appointment_requested", "appointment_approved", "appointment_declined", "appointment_completed"],
             required: true
         },
         title: {

@@ -2,26 +2,32 @@ const API_BASE_URL = (
     import.meta.env.VITE_API_BASE_URL || "https://final-hackathon-practice.vercel.app/api"
 ).replace(/\/+$/, "");
 
-const TOKEN_KEY = "clinic-access-token";
+const AUTH_SESSION_KEY = "clinic-authenticated";
+const LEGACY_TOKEN_KEY = "clinic-access-token";
 
-export function getToken() {
-    return sessionStorage.getItem(TOKEN_KEY);
+export function hasAuthSession() {
+    if (localStorage.getItem(AUTH_SESSION_KEY) === "true") return true;
+
+    if (sessionStorage.getItem(LEGACY_TOKEN_KEY)) {
+        sessionStorage.removeItem(LEGACY_TOKEN_KEY);
+        localStorage.setItem(AUTH_SESSION_KEY, "true");
+        return true;
+    }
+
+    return false;
 }
 
-export function setToken(token) {
-    sessionStorage.setItem(TOKEN_KEY, token);
+export function setAuthSession() {
+    localStorage.setItem(AUTH_SESSION_KEY, "true");
 }
 
-export function clearToken() {
-    sessionStorage.removeItem(TOKEN_KEY);
+export function clearAuthSession() {
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    sessionStorage.removeItem(LEGACY_TOKEN_KEY);
 }
 
 async function request(path, options = {}) {
     const headers = new Headers(options.headers || {});
-    const token = getToken();
-    if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-    }
     const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
     if (options.body !== undefined && !isFormData) {
         headers.set("Content-Type", "application/json");

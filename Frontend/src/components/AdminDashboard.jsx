@@ -261,8 +261,8 @@ export default function AdminDashboard({ user, section }) {
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Current totals across the clinic.</p>
                         </div>
                         {loading ? <div className="grid min-h-32 place-items-center"><LoadingIndicator /></div> : (
-                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                                {["pending", "approved", "rejected", "cancelled", "expired"].map(status => (
+                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+                                {["pending", "approved", "completed", "rejected", "cancelled", "expired"].map(status => (
                                     <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-950/5 bg-emerald-50/30 p-3 dark:border-white/10 dark:bg-slate-950/50" key={status}><StatusBadge status={status} /><strong className="text-xl font-black text-emerald-950 dark:text-slate-100">{appointmentCounts[status] || 0}</strong></div>
                                 ))}
                             </div>
@@ -397,6 +397,7 @@ export default function AdminDashboard({ user, section }) {
                                 <option value="">All statuses</option>
                                 <option value="pending">Pending</option>
                                 <option value="approved">Approved</option>
+                                <option value="completed">Completed</option>
                                 <option value="rejected">Rejected</option>
                                 <option value="cancelled">Cancelled</option>
                                 <option value="expired">Expired</option>

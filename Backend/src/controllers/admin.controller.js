@@ -246,7 +246,7 @@ export async function getAllAppointments(req, res) {
         filter.patient = { $in: matchingPatients.map(patient => patient.id) };
     }
     if (req.query.status) {
-        if (!["pending", "approved", "rejected", "cancelled", "expired"].includes(req.query.status)) {
+        if (!["pending", "approved", "completed", "rejected", "cancelled", "expired"].includes(req.query.status)) {
             return res.status(400).json({ message: "Invalid appointment status filter" });
         }
         filter.status = req.query.status;

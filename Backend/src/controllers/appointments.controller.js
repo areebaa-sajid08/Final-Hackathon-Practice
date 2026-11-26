@@ -84,8 +84,8 @@ export async function getDoctorAppointments(req, res) {
 
 export async function updateAppointmentStatus(req, res) {
     const { status, rejectionReason } = req.body || {};
-    if (!["approved", "rejected"].includes(status)) {
-        return res.status(400).json({ message: "Status must be approved or rejected" });
+    if (!["approved", "completed", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Status must be approved, completed, or rejected" });
     }
     if (status === "rejected" && (
         typeof rejectionReason !== "string"
@@ -102,7 +102,7 @@ export async function updateAppointmentStatus(req, res) {
         ? { $set: { status, rejectionReason: rejectionReason.trim() } }
         : { $set: { status }, $unset: { rejectionReason: 1 } };
     const appointment = await appointmentModel.findOneAndUpdate(
-        { _id: req.params.id, doctor: req.user.id, status: "pending" },
+        { _id: req.params.id, doctor: req.user.id, status: status === "completed" ? "approved" : "pending" },
         update,
         { new: true, runValidators: true }
     ).populate({ path: "patient", select: "name email" });
@@ -115,18 +115,25 @@ export async function updateAppointmentStatus(req, res) {
         if (!existing) {
             return res.status(404).json({ message: "Appointment not found" });
         }
-        return res.status(409).json({ message: "Only pending appointments can be updated" });
+        return res.status(409).json({
+            message: status === "completed"
+                ? "Only approved appointments can be marked completed"
+                : "Only pending appointments can be updated"
+        });
     }
     const date = appointment.appointmentDate.toISOString().slice(0, 10);
     const approved = status === "approved";
+    const completed = status === "completed";
     await notificationModel.create({
         recipient: appointment.patient._id,
         appointment: appointment._id,
-        type: approved ? "appointment_approved" : "appointment_declined",
-        title: approved ? "Appointment approved" : "Appointment declined",
+        type: approved ? "appointment_approved" : completed ? "appointment_completed" : "appointment_declined",
+        title: approved ? "Appointment approved" : completed ? "Appointment completed" : "Appointment declined",
         message: approved
             ? `Your appointment for ${date} at ${appointment.appointmentTime} was approved.`
-            : `Your appointment for ${date} at ${appointment.appointmentTime} was declined. Reason: ${rejectionReason.trim()}`
+            : completed
+                ? `Your appointment for ${date} at ${appointment.appointmentTime} has been marked completed.`
+                : `Your appointment for ${date} at ${appointment.appointmentTime} was declined. Reason: ${rejectionReason.trim()}`
     });
     return res.status(200).json({ message: `Appointment ${status}`, appointment });
 }

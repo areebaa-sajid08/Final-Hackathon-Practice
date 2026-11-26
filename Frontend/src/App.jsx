@@ -11,7 +11,7 @@ import NotificationCenter from "./components/NotificationCenter.jsx";
 import PatientDashboard from "./components/PatientDashboard.jsx";
 import ProfileAvatar from "./components/ProfileAvatar.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
-import { api, clearToken, getToken, setToken } from "./lib/api.js";
+import { api, clearAuthSession, hasAuthSession, setAuthSession } from "./lib/api.js";
 
 function PublicHeader({ onLogin, onRegister, onDoctors, onHome, active, theme, onToggleTheme }) {
     return (
@@ -163,9 +163,9 @@ function BookingSuccess({ result, onClose }) {
 
 export default function App() {
     const [theme, setTheme] = useState(() => localStorage.getItem("carewell-theme") === "dark" ? "dark" : "light");
-    const [hasToken, setHasToken] = useState(() => Boolean(getToken()));
+    const [hasSession, setHasSession] = useState(() => hasAuthSession());
     const [user, setUser] = useState(null);
-    const [sessionLoading, setSessionLoading] = useState(Boolean(getToken()));
+    const [sessionLoading, setSessionLoading] = useState(() => hasAuthSession());
     const [activeView, setActiveView] = useState("overview");
     const [authMode, setAuthMode] = useState("");
     const [bookingDoctor, setBookingDoctor] = useState(null);
@@ -182,24 +182,24 @@ export default function App() {
     }, [theme]);
 
     useEffect(() => {
-        if (!hasToken) return undefined;
+        if (!hasSession) return undefined;
         let current = true;
         api.get("/auth/me")
             .then(result => { if (current) setUser(result.user); })
             .catch(error => {
                 if (!current) return;
-                clearToken();
-                setHasToken(false);
+                clearAuthSession();
+                setHasSession(false);
                 setNotice(error.status === 401 ? "Your session expired. Please sign in again." : error.message);
             })
             .finally(() => { if (current) setSessionLoading(false); });
         return () => { current = false; };
-    }, [hasToken]);
+    }, [hasSession]);
 
     function handleAuthSuccess(result) {
-        if (!result.token || !result.user) throw new Error("The API did not return a signed-in user.");
-        setToken(result.token);
-        setHasToken(true);
+        if (!result.user) throw new Error("The API did not return a signed-in user.");
+        setAuthSession();
+        setHasSession(true);
         setUser(result.user);
         setAuthMode("");
         setActiveView("overview");
@@ -227,8 +227,8 @@ export default function App() {
         } catch {
             setNotice("Signed out on this device. The clinic API could not confirm logout.");
         }
-        clearToken();
-        setHasToken(false);
+        clearAuthSession();
+        setHasSession(false);
         setUser(null);
         setActiveView("overview");
     }
@@ -261,7 +261,7 @@ export default function App() {
                 {notice && <div className="fixed bottom-5 left-1/2 z-40 flex w-[min(92vw,480px)] -translate-x-1/2 items-center justify-between gap-4 rounded-2xl border border-white/70 bg-white/95 px-4 py-3 text-xs text-emerald-950 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-slate-900 dark:text-slate-100" role="status"><span>{notice}</span><button type="button" onClick={() => setNotice("")} aria-label="Dismiss message"><Icon name="close" size={16} /></button></div>}
                 {authMode && <AuthModal mode={authMode} onClose={() => { setAuthMode(""); setPendingDoctor(null); }} onSuccess={handleAuthSuccess} />}
                 {bookingDoctor && <BookingModal doctor={bookingDoctor} onClose={() => setBookingDoctor(null)} onBooked={result => { setBookingDoctor(null); setBookingResult(result); }} />}
-                {bookingResult && <BookingSuccess result={bookingResult} onClose={() => { setBookingResult(null); setHasToken(true); setActiveView("appointments"); setRefreshKey(value => value + 1); }} />}
+                {bookingResult && <BookingSuccess result={bookingResult} onClose={() => { setBookingResult(null); setHasSession(true); setActiveView("appointments"); setRefreshKey(value => value + 1); }} />}
             </div>
         );
     }

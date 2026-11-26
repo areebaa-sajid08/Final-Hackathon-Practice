@@ -9,7 +9,7 @@ function formatCreatedAt(value) {
 }
 
 function getNotificationIcon(type) {
-    if (type === "appointment_approved") return "check";
+    if (type === "appointment_approved" || type === "appointment_completed") return "check";
     if (type === "appointment_declined") return "close";
     return "calendar";
 }

@@ -67,6 +67,16 @@ export default function AppointmentList({ appointments = [], role, onCancel, onS
                                 </button>
                             </div>
                         )}
+                        {role === "doctor" && appointment.status === "approved" && (
+                            <button
+                                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2.5 text-xs font-bold text-teal-800 transition hover:bg-teal-100 dark:border-teal-900 dark:bg-teal-950/60 dark:text-teal-200 dark:hover:bg-teal-900 sm:justify-self-end"
+                                type="button"
+                                onClick={() => onStatus(appointment._id, "completed")}
+                                aria-label={`Mark appointment with ${name} completed`}
+                            >
+                                <Icon name="check" size={15} /> Mark completed
+                            </button>
+                        )}
                         {role === "patient" && appointment.status === "pending" && (
                             <button className="rounded-xl border border-rose-200 px-4 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300 dark:hover:bg-rose-950 sm:justify-self-end" type="button" onClick={() => onCancel(appointment._id)}>Cancel request</button>
                         )}
