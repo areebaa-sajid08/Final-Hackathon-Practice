@@ -83,7 +83,7 @@ export default function BookingModal({ doctor, onClose, onBooked }) {
                             <textarea className="min-h-24 resize-y rounded-xl border border-emerald-950/10 bg-white/80 px-4 py-3 text-sm font-normal outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100" value={form.reason} onChange={event => setForm(current => ({ ...current, reason: event.target.value }))} required maxLength={1000} rows={3} placeholder="What would you like the doctor to know?" />
                         </label>
                         <p className="text-xs text-slate-500 dark:text-slate-400">Your request is pending until the doctor reviews it.</p>
-                        {error && <p className="rounded-xl bg-rose-50 px-4 py-3 text-xs text-rose-700" role="alert">{error}</p>}
+                        {error && <p className="rounded-xl bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
                         <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={busy || slotAvailability === false}>
                             {busy ? "Sending request…" : "Request appointment"}
                             {!busy && <Icon name="arrow" size={17} />}

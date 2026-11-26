@@ -85,8 +85,8 @@ export default function PatientDashboard({ user, refreshKey, onBrowseDoctors }) 
                     </div>
                     <button className="inline-flex items-center gap-2 self-start text-xs font-bold text-teal-700 transition hover:gap-3 dark:text-teal-300" type="button" onClick={onBrowseDoctors}>Find a doctor <Icon name="arrow" size={15} /></button>
                 </div>
-                {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{error}</p>}
-                {actionError && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{actionError}</p>}
+                {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
+                {actionError && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{actionError}</p>}
                 {loading ? <div className="grid min-h-40 place-items-center"><LoadingIndicator /></div> : (
                     <AppointmentList appointments={appointments} role="patient" onCancel={cancelAppointment} />
                 )}

@@ -96,8 +96,8 @@ export default function DoctorDashboard({ user }) {
                     </div>
                     <span className="inline-flex items-center gap-2 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-200"><Icon name="activity" size={15} /> {pending} pending</span>
                 </div>
-                {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{error}</p>}
-                {actionError && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{actionError}</p>}
+                {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
+                {actionError && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{actionError}</p>}
                 {loading ? <div className="grid min-h-40 place-items-center"><LoadingIndicator /></div> : (
                     <AppointmentList appointments={appointments} role="doctor" onStatus={setStatus} />
                 )}

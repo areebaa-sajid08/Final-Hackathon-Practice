@@ -50,7 +50,7 @@ export default function DoctorDirectory({ search, setSearch, onBook, fullPage = 
             </div>
 
             {error && (
-                <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-rose-100 bg-rose-50/80 p-5 text-rose-900 sm:flex-row sm:items-center">
+                <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-rose-100 bg-rose-50/80 p-5 text-rose-900 dark:border-rose-900 dark:bg-rose-950/70 dark:text-rose-200 sm:flex-row sm:items-center">
                     <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-rose-700 dark:bg-rose-950 dark:text-rose-300"><Icon name="activity" /></span>
                     <div className="min-w-0 flex-1">
                         <strong className="text-sm">Doctors are temporarily unavailable</strong>

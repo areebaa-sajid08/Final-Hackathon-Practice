@@ -47,7 +47,7 @@ export default function DeclineReasonModal({ patientName, onClose, onSubmit }) {
                         />
                     </label>
                     <span className="text-right text-[10px] text-slate-400">{reason.length}/1000 characters</span>
-                    {error && <p className="rounded-xl bg-rose-100 px-4 py-3 text-xs text-rose-800" role="alert">{error}</p>}
+                    {error && <p className="rounded-xl bg-rose-100 px-4 py-3 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
                     <div className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                         <button className="rounded-xl border border-emerald-900/10 px-4 py-3 text-xs font-bold text-emerald-900 transition hover:bg-white dark:border-white/10 dark:text-emerald-200 dark:hover:bg-white/10" type="button" onClick={onClose} disabled={busy}>Keep request</button>
                         <button className="rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 px-4 py-3 text-xs font-bold text-white shadow-lg shadow-rose-900/15 transition hover:-translate-y-0.5 disabled:opacity-60" type="submit" disabled={busy || !reason.trim()}>{busy ? "Declining…" : "Decline appointment"}</button>

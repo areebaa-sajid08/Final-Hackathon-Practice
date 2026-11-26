@@ -294,7 +294,7 @@ export default function App() {
                     ) : isAdmin ? (
                         <AdminDashboard user={user} section={activeView} />
                     ) : (
-                        <div className="flex items-center gap-4 rounded-2xl border border-rose-100 bg-rose-50 p-5 text-rose-900"><Icon name="shield" /><div><strong>Account role unavailable</strong><p className="mt-1 text-xs">Contact your clinic administrator to restore access.</p></div></div>
+                        <div className="flex items-center gap-4 rounded-2xl border border-rose-100 bg-rose-50 p-5 text-rose-900 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200"><Icon name="shield" /><div><strong>Account role unavailable</strong><p className="mt-1 text-xs">Contact your clinic administrator to restore access.</p></div></div>
                     )}
                 </main>
             </div>

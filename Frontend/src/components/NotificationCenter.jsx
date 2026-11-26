@@ -113,7 +113,7 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                             </button>
                         )}
                     </header>
-                    {error && <p className="bg-rose-50 px-4 py-3 text-xs text-rose-700" role="alert">{error}</p>}
+                    {error && <p className="bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
                     {loading ? (
                         <div className="grid min-h-32 place-items-center p-6"><LoadingIndicator /></div>
                     ) : notifications.length === 0 ? (

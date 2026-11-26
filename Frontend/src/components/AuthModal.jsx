@@ -59,7 +59,7 @@ export default function AuthModal({ mode: initialMode = "login", onClose, onSucc
                             Password
                             <PasswordInput name="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={form.password} onChange={updateField} required minLength={8} maxLength={128} placeholder="At least 8 characters" />
                         </label>
-                        {error && <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs leading-relaxed text-rose-700" role="alert">{error}</p>}
+                        {error && <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs leading-relaxed text-rose-700 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
                         <button className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={busy}>
                             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
                             {!busy && <Icon name="arrow" size={17} />}

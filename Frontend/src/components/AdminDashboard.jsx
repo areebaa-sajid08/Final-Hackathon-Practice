@@ -246,7 +246,7 @@ export default function AdminDashboard({ user, section }) {
             </div>
 
             {message && <div className="flex items-start gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200" role="status"><Icon name="check" size={17} /> {message}</div>}
-            {error && <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs text-rose-700" role="alert">{error}</p>}
+            {error && <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
 
             {section === "overview" && (
                 <div className="grid gap-6">
