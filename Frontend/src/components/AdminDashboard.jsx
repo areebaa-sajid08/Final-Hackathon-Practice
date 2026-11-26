@@ -8,11 +8,67 @@ import ProfileAvatar from "./ProfileAvatar.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const specialtyGroups = [
+    {
+        label: "Primary care",
+        options: ["Family Medicine", "General Practice", "Hospital Medicine", "Internal Medicine", "Preventive Medicine"]
+    },
+    {
+        label: "Medical specialties",
+        options: [
+            "Allergy and Immunology", "Cardiology", "Critical Care Medicine", "Dermatology", "Endocrinology",
+            "Gastroenterology", "Geriatrics", "Hematology", "Hepatology", "Infectious Disease",
+            "Nephrology", "Medical Oncology", "Pulmonology", "Rheumatology", "Sleep Medicine",
+            "Sports Medicine"
+        ]
+    },
+    {
+        label: "Surgical specialties",
+        options: [
+            "Cardiothoracic Surgery", "Colorectal Surgery", "General Surgery", "Neurosurgery",
+            "Obstetrics and Gynecology", "Ophthalmology", "Oral and Maxillofacial Surgery",
+            "Orthopedic Surgery", "Otolaryngology (ENT)", "Pediatric Surgery",
+            "Plastic and Reconstructive Surgery", "Surgical Oncology", "Transplant Surgery",
+            "Urology", "Vascular Surgery"
+        ]
+    },
+    {
+        label: "Children's health",
+        options: [
+            "Adolescent Medicine", "Neonatology", "Pediatric Cardiology", "Pediatric Endocrinology",
+            "Pediatric Neurology", "Pediatrics"
+        ]
+    },
+    {
+        label: "Women's health",
+        options: [
+            "Gynecologic Oncology", "Maternal-Fetal Medicine",
+            "Reproductive Endocrinology and Infertility"
+        ]
+    },
+    {
+        label: "Mental and behavioral health",
+        options: ["Behavioral Health", "Child and Adolescent Psychiatry", "Psychiatry", "Psychology"]
+    },
+    {
+        label: "Diagnostic and rehabilitation",
+        options: [
+            "Anesthesiology", "Audiology", "Diagnostic Radiology", "Interventional Radiology",
+            "Nuclear Medicine", "Occupational Therapy", "Pathology",
+            "Physical Medicine and Rehabilitation", "Physical Therapy", "Speech-Language Pathology"
+        ]
+    },
+    {
+        label: "Other specialties",
+        options: ["Dentistry", "Emergency Medicine", "Optometry", "Pain Medicine", "Palliative Care"]
+    }
+];
 const emptyDoctor = {
     name: "",
     email: "",
     password: "",
     specialization: "",
+    customSpecialization: "",
     experience: "",
     availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     startTime: "09:00",
@@ -102,6 +158,13 @@ export default function AdminDashboard({ user, section }) {
 
     async function createDoctor(event) {
         event.preventDefault();
+        const specialization = doctorForm.specialization === "__other__"
+            ? doctorForm.customSpecialization.trim()
+            : doctorForm.specialization.trim();
+        if (!specialization) {
+            setError("Select or enter a doctor specialization.");
+            return;
+        }
         if (doctorForm.availableDays.length === 0) {
             setError("Select at least one available day.");
             return;
@@ -118,7 +181,7 @@ export default function AdminDashboard({ user, section }) {
             formData.append("name", doctorForm.name);
             formData.append("email", doctorForm.email);
             formData.append("password", doctorForm.password);
-            formData.append("specialization", doctorForm.specialization);
+            formData.append("specialization", specialization);
             formData.append("experience", String(Number(doctorForm.experience)));
             formData.append("availability", JSON.stringify({
                 availableDays: doctorForm.availableDays,
@@ -224,7 +287,24 @@ export default function AdminDashboard({ user, section }) {
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Full name<input className={fieldClass} value={doctorForm.name} onChange={event => setDoctorForm(current => ({ ...current, name: event.target.value }))} required maxLength={100} /></label>
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Email<input className={fieldClass} type="email" value={doctorForm.email} onChange={event => setDoctorForm(current => ({ ...current, email: event.target.value }))} required /></label>
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Temporary password<PasswordInput className="py-3" value={doctorForm.password} onChange={event => setDoctorForm(current => ({ ...current, password: event.target.value }))} required minLength={8} maxLength={128} autoComplete="new-password" /></label>
-                                <label className="grid gap-2 text-xs font-bold text-emerald-950">Specialization<input className={fieldClass} value={doctorForm.specialization} onChange={event => setDoctorForm(current => ({ ...current, specialization: event.target.value }))} required maxLength={100} placeholder="e.g. Cardiology" /></label>
+                                <label className="grid gap-2 text-xs font-bold text-emerald-950">
+                                    Specialization
+                                    <select className={fieldClass} value={doctorForm.specialization} onChange={event => setDoctorForm(current => ({ ...current, specialization: event.target.value }))} required>
+                                        <option value="">Select a specialty</option>
+                                        {specialtyGroups.map(group => (
+                                            <optgroup label={group.label} key={group.label}>
+                                                {group.options.map(specialty => <option value={specialty} key={specialty}>{specialty}</option>)}
+                                            </optgroup>
+                                        ))}
+                                        <option value="__other__">Other (not listed)</option>
+                                    </select>
+                                </label>
+                                {doctorForm.specialization === "__other__" && (
+                                    <label className="grid gap-2 text-xs font-bold text-emerald-950">
+                                        Enter specialty
+                                        <input className={fieldClass} value={doctorForm.customSpecialization} onChange={event => setDoctorForm(current => ({ ...current, customSpecialization: event.target.value }))} required maxLength={100} placeholder="Doctor's specialty" />
+                                    </label>
+                                )}
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950">Years of experience<input className={fieldClass} type="number" min="0" max="80" step="1" value={doctorForm.experience} onChange={event => setDoctorForm(current => ({ ...current, experience: event.target.value }))} required /></label>
                                 <label className="grid gap-2 text-xs font-bold text-emerald-950 sm:col-span-2 xl:col-span-3">
                                     <span>Profile picture <span className="font-normal text-slate-400">(optional · JPG, PNG, or WebP · max 5 MB)</span></span>
