@@ -107,11 +107,23 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                                 <p className="mt-0.5 text-xs text-emerald-900/55 dark:text-emerald-200/60">{unreadCount ? `${unreadCount} unread` : "You're all caught up"}</p>
                             </span>
                         </div>
-                        {unreadCount > 0 && (
-                            <button className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-900/10 bg-white px-3 py-2 text-[11px] font-bold text-emerald-800 transition hover:bg-emerald-50 dark:border-white/10 dark:bg-slate-800 dark:text-emerald-200 dark:hover:bg-slate-700" type="button" onClick={markAllRead}>
-                                <Icon name="check" size={14} /> Mark all read
-                            </button>
-                        )}
+                        <div className="flex items-center gap-2">
+                            {unreadCount > 0 && (
+                                <button className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-900/10 bg-white px-3 py-2 text-[11px] font-bold text-emerald-800 transition hover:bg-emerald-50 dark:border-white/10 dark:bg-slate-800 dark:text-emerald-200 dark:hover:bg-slate-700" type="button" onClick={markAllRead}>
+                                    <Icon name="check" size={14} /> Mark all read
+                                </button>
+                            )}
+                            {!inline && (
+                                <button
+                                    className="grid size-9 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-emerald-100 hover:text-emerald-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                                    type="button"
+                                    aria-label="Close notifications"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    <Icon name="close" size={17} />
+                                </button>
+                            )}
+                        </div>
                     </header>
                     {error && <p className="bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-200" role="alert">{error}</p>}
                     {loading ? (
