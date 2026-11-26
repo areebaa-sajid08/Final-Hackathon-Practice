@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import connectDB from "../db/db.js";
 import userModel from "../models/users.model.js";
 
-const publicUserFields = "_id name email role specialization experience isActive createdAt";
+const publicUserFields = "_id name email role specialization experience profileImage isActive createdAt";
 
 function createToken(user) {
     return jwt.sign(

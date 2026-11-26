@@ -4,6 +4,7 @@ import AppointmentList from "./AppointmentList.jsx";
 import DeclineReasonModal from "./DeclineReasonModal.jsx";
 import Icon from "./Icon.jsx";
 import LoadingIndicator from "./LoadingIndicator.jsx";
+import ProfileAvatar from "./ProfileAvatar.jsx";
 
 function StatCard({ icon, label, value, tone }) {
     const tones = {
@@ -12,10 +13,10 @@ function StatCard({ icon, label, value, tone }) {
         blue: "from-sky-500 to-indigo-600"
     };
     return (
-        <article className="group rounded-3xl border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur transition duration-300 hover:-translate-y-1 hover:rotate-1 hover:shadow-2xl sm:p-6">
+        <article className="group rounded-3xl border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur transition duration-300 hover:-translate-y-1 hover:rotate-1 hover:shadow-2xl dark:border-white/10 dark:bg-slate-900/80 sm:p-6">
             <div className={`grid size-12 place-items-center rounded-2xl bg-gradient-to-br ${tones[tone]} text-white shadow-lg transition group-hover:rotate-6`}><Icon name={icon} size={21} /></div>
-            <p className="mt-5 text-xs font-semibold text-slate-500">{label}</p>
-            <strong className="mt-1 block text-3xl font-black tracking-tight text-emerald-950">{value}</strong>
+            <p className="mt-5 text-xs font-semibold text-slate-500 dark:text-slate-400">{label}</p>
+            <strong className="mt-1 block text-3xl font-black tracking-tight text-emerald-950 dark:text-slate-100">{value}</strong>
         </article>
     );
 }
@@ -74,12 +75,12 @@ export default function DoctorDashboard({ user }) {
         <div className="grid gap-7">
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                 <div>
-                    <p className="mb-2 text-[11px] font-black uppercase tracking-[0.22em] text-teal-700">Doctor portal</p>
-                    <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Welcome, Dr. {user.name}</h1>
-                    <p className="mt-2 text-sm text-slate-500">{user.specialization || "Your appointment desk"}</p>
+                    <p className="mb-2 text-[11px] font-black uppercase tracking-[0.22em] text-teal-700 dark:text-teal-300">Doctor portal</p>
+                    <h1 className="text-3xl font-black tracking-tight text-emerald-950 dark:text-slate-100 sm:text-4xl">Welcome, Dr. {user.name}</h1>
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{user.specialization || "Your appointment desk"}</p>
                 </div>
-                <div className="inline-flex items-center gap-2 self-start rounded-2xl border border-white bg-white/75 px-4 py-3 text-xs font-bold text-emerald-800 shadow-lg shadow-emerald-950/5">
-                    <span className="grid size-8 place-items-center rounded-xl bg-emerald-100"><Icon name="doctor" size={18} /></span> Doctor account
+                <div className="inline-flex items-center gap-2 self-start rounded-2xl border border-white bg-white/75 px-4 py-3 text-xs font-bold text-emerald-800 shadow-lg shadow-emerald-950/5 dark:border-white/10 dark:bg-slate-900/80 dark:text-emerald-200">
+                    <ProfileAvatar name={user.name} imageUrl={user.profileImage} size="table" /> Doctor account
                 </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -87,13 +88,13 @@ export default function DoctorDashboard({ user }) {
                 <StatCard icon="clock" label="Need your review" value={loading ? "—" : pending} tone="amber" />
                 <StatCard icon="check" label="Approved visits" value={loading ? "—" : approved} tone="blue" />
             </div>
-            <section className="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur sm:p-7">
+            <section className="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-xl shadow-emerald-950/5 backdrop-blur dark:border-white/10 dark:bg-slate-900/80 sm:p-7">
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="text-lg font-extrabold text-emerald-950">Appointment requests</h2>
-                        <p className="mt-1 text-xs text-slate-500">Review patients and update pending requests.</p>
+                        <h2 className="text-lg font-extrabold text-emerald-950 dark:text-slate-100">Appointment requests</h2>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Review patients and update pending requests.</p>
                     </div>
-                    <span className="inline-flex items-center gap-2 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800"><Icon name="activity" size={15} /> {pending} pending</span>
+                    <span className="inline-flex items-center gap-2 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-200"><Icon name="activity" size={15} /> {pending} pending</span>
                 </div>
                 {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{error}</p>}
                 {actionError && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert">{actionError}</p>}

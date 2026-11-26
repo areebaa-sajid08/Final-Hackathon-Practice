@@ -19,10 +19,10 @@ function dateParts(value) {
 export default function AppointmentList({ appointments = [], role, onCancel, onStatus }) {
     if (appointments.length === 0) {
         return (
-            <div className="grid justify-items-center gap-2 rounded-3xl border border-dashed border-emerald-900/15 bg-emerald-50/40 px-5 py-12 text-center">
-                <span className="grid size-14 place-items-center rounded-2xl bg-white text-emerald-700 shadow-lg shadow-emerald-950/5"><Icon name="calendar" size={24} /></span>
-                <h3 className="mt-2 text-base font-bold text-emerald-950">No appointments yet</h3>
-                <p className="text-sm text-slate-500">Your appointment activity will appear here.</p>
+            <div className="grid justify-items-center gap-2 rounded-3xl border border-dashed border-emerald-900/15 bg-emerald-50/40 px-5 py-12 text-center dark:border-white/10 dark:bg-slate-950/40">
+                <span className="grid size-14 place-items-center rounded-2xl bg-white text-emerald-700 shadow-lg shadow-emerald-950/5 dark:bg-slate-800 dark:text-emerald-300"><Icon name="calendar" size={24} /></span>
+                <h3 className="mt-2 text-base font-bold text-emerald-950 dark:text-slate-100">No appointments yet</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Your appointment activity will appear here.</p>
             </div>
         );
     }
@@ -34,27 +34,27 @@ export default function AppointmentList({ appointments = [], role, onCancel, onS
                 const name = otherPerson?.name || "Clinic account";
                 const date = dateParts(appointment.appointmentDate);
                 return (
-                    <article className="group grid gap-4 rounded-3xl border border-emerald-950/5 bg-white/80 p-4 shadow-lg shadow-emerald-950/[0.03] transition hover:-translate-y-0.5 hover:shadow-xl sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:items-center sm:p-5" key={appointment._id}>
-                        <div className="grid size-14 content-center justify-items-center rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-800">
+                    <article className="group grid gap-4 rounded-3xl border border-emerald-950/5 bg-white/80 p-4 shadow-lg shadow-emerald-950/[0.03] transition hover:-translate-y-0.5 hover:shadow-xl dark:border-white/10 dark:bg-slate-950/60 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:items-center sm:p-5" key={appointment._id}>
+                        <div className="grid size-14 content-center justify-items-center rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-800 dark:from-emerald-950 dark:to-teal-950 dark:text-emerald-200">
                             <span className="text-[9px] font-bold uppercase tracking-wider">{date.month}</span>
                             <strong className="text-xl leading-none">{date.day}</strong>
                         </div>
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-bold text-emerald-950">{role === "doctor" ? name : doctorDisplayName(name)}</h3>
+                                <h3 className="font-bold text-emerald-950 dark:text-slate-100">{role === "doctor" ? name : doctorDisplayName(name)}</h3>
                                 <StatusBadge status={appointment.status} />
                             </div>
-                            <p className="mt-1 truncate text-xs text-slate-500">{role === "doctor" ? appointment.patient?.email : otherPerson?.specialization}</p>
-                            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-slate-500">
+                            <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">{role === "doctor" ? appointment.patient?.email : otherPerson?.specialization}</p>
+                            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-slate-500 dark:text-slate-400">
                                 <span className="inline-flex items-center gap-1.5"><Icon name="clock" size={14} /> {appointment.appointmentTime}</span>
                                 <span className="inline-flex items-center gap-1.5"><Icon name="calendar" size={14} /> {date.full}</span>
                             </div>
                             {role === "patient" && appointment.cancellationReason ? (
-                                <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">{appointment.cancellationReason}</p>
+                                <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:bg-amber-950/70 dark:text-amber-200">{appointment.cancellationReason}</p>
                             ) : role === "patient" && appointment.status === "rejected" && appointment.rejectionReason ? (
-                                <p className="mt-3 rounded-xl bg-rose-50 px-3 py-2 text-xs leading-relaxed text-rose-900"><strong>Reason for decline:</strong> {appointment.rejectionReason}</p>
+                                <p className="mt-3 rounded-xl bg-rose-50 px-3 py-2 text-xs leading-relaxed text-rose-900 dark:bg-rose-950/70 dark:text-rose-200"><strong>Reason for decline:</strong> {appointment.rejectionReason}</p>
                             ) : appointment.reason ? (
-                                <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-500">{appointment.reason}</p>
+                                <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{appointment.reason}</p>
                             ) : null}
                         </div>
                         {role === "doctor" && appointment.status === "pending" && (
@@ -62,13 +62,13 @@ export default function AppointmentList({ appointments = [], role, onCancel, onS
                                 <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-800" type="button" onClick={() => onStatus(appointment._id, "approved")} aria-label={`Approve appointment with ${name}`}>
                                     <Icon name="check" size={15} /> Approve
                                 </button>
-                                <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100" type="button" onClick={() => onStatus(appointment._id, "rejected")} aria-label={`Reject appointment with ${name}`}>
+                                <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-300 dark:hover:bg-rose-900" type="button" onClick={() => onStatus(appointment._id, "rejected")} aria-label={`Reject appointment with ${name}`}>
                                     <Icon name="close" size={15} /> Decline
                                 </button>
                             </div>
                         )}
                         {role === "patient" && appointment.status === "pending" && (
-                            <button className="rounded-xl border border-rose-200 px-4 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-50 sm:justify-self-end" type="button" onClick={() => onCancel(appointment._id)}>Cancel request</button>
+                            <button className="rounded-xl border border-rose-200 px-4 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300 dark:hover:bg-rose-950 sm:justify-self-end" type="button" onClick={() => onCancel(appointment._id)}>Cancel request</button>
                         )}
                     </article>
                 );

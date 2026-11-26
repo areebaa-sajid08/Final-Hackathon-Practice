@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @theme {
   --font-sans: "DM Sans", "Segoe UI", sans-serif;
 }
@@ -14,7 +16,7 @@
   }
 
   body {
-    @apply m-0 min-h-screen min-w-[320px] bg-[#f5f9f6] font-sans antialiased text-slate-800;
+    @apply m-0 min-h-screen min-w-[320px] bg-[#f5f9f6] font-sans antialiased text-slate-800 dark:bg-slate-950 dark:text-slate-100;
   }
 
   button,
