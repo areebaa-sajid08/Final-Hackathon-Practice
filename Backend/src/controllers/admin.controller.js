@@ -1,11 +1,13 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import uploadFile from "../../services/storage.service.js";
 import appointmentModel from "../models/appointments.model.js";
 import userModel from "../models/users.model.js";
 import { DOCTOR_UNAVAILABLE_CANCELLATION_REASON, getReactivatedAppointmentStatus } from "../utils/appointment-recovery.js";
 import { DEFAULT_DOCTOR_AVAILABILITY, WEEKDAYS } from "../utils/availability.js";
+import { getSupportedImageExtension } from "../utils/image-validation.js";
 
-const userFields = "_id name email role specialization experience availability isActive createdAt";
+const userFields = "_id name email role specialization experience profileImage availability isActive createdAt";
 
 function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -54,7 +56,19 @@ export async function getUsers(req, res) {
 }
 
 export async function createDoctor(req, res) {
-    const { name, email, password, specialization, experience, availability: requestedAvailability } = req.body || {};
+    const { name, email, password, specialization, experience } = req.body || {};
+    let { availability: requestedAvailability } = req.body || {};
+    if (typeof requestedAvailability === "string") {
+        try {
+            requestedAvailability = JSON.parse(requestedAvailability);
+        } catch {
+            return res.status(400).json({ message: "Availability must be valid JSON" });
+        }
+    }
+    const imageExtension = req.file ? getSupportedImageExtension(req.file) : null;
+    if (req.file && !imageExtension) {
+        return res.status(400).json({ message: "Profile image must be a valid JPEG, PNG, or WebP image" });
+    }
     if (typeof name !== "string" || !name.trim()) {
         return res.status(400).json({ message: "Name is required" });
     }
@@ -98,6 +112,9 @@ export async function createDoctor(req, res) {
         });
     }
 
+    const profileImage = req.file
+        ? (await uploadFile(req.file.buffer, `doctor-profile${imageExtension}`, "doctors")).url
+        : undefined;
     const doctor = await userModel.create({
         name: name.trim(),
         email: email.trim().toLowerCase(),
@@ -105,6 +122,7 @@ export async function createDoctor(req, res) {
         role: "doctor",
         specialization: specialization.trim(),
         experience: years,
+        profileImage,
         availability: { availableDays, startTime, endTime }
     });
     return res.status(201).json({

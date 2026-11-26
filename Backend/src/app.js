@@ -46,6 +46,13 @@ app.use("/api/admin", adminRoutes);
 
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 app.use((error, _req, res, _next) => {
+    if (error.name === "MulterError") {
+        return res.status(400).json({
+            message: error.code === "LIMIT_FILE_SIZE"
+                ? "Profile image must be 5 MB or smaller"
+                : "Invalid image upload"
+        });
+    }
     if (error.statusCode === 403) {
         return res.status(403).json({ message: error.message });
     }

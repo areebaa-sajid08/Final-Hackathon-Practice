@@ -77,6 +77,11 @@ const userSchema = new mongoose.Schema(
             min: 0,
             max: 80
         },
+        profileImage: {
+            type: String,
+            trim: true,
+            maxlength: 2048
+        },
         availability: {
             type: availabilitySchema,
             default() {

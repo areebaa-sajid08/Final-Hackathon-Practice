@@ -14,6 +14,7 @@ import {
     getClinicDateTime,
     getReactivatedAppointmentStatus
 } from "../src/utils/appointment-recovery.js";
+import { getSupportedImageExtension } from "../src/utils/image-validation.js";
 
 test("login distinguishes inactive accounts from invalid credentials", async () => {
     const password = "correct-password";
@@ -143,6 +144,28 @@ test("user model accepts clinic roles and requires doctor details", async () => 
     assert.ok(error.errors.specialization);
     assert.ok(error.errors.experience);
     assert.deepEqual(doctor.availability.availableDays, DEFAULT_DOCTOR_AVAILABILITY.availableDays);
+
+    doctor.specialization = "Family Medicine";
+    doctor.experience = 4;
+    doctor.profileImage = "https://images.example.test/doctor.webp";
+    await doctor.validate();
+    assert.equal(doctor.profileImage, "https://images.example.test/doctor.webp");
+});
+
+test("doctor profile images accept supported image signatures and reject mismatches", () => {
+    const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0x00]);
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const webp = Buffer.alloc(12);
+    webp.write("RIFF", 0);
+    webp.write("WEBP", 8);
+
+    assert.equal(getSupportedImageExtension({ mimetype: "image/jpeg", buffer: jpeg }), ".jpg");
+    assert.equal(getSupportedImageExtension({ mimetype: "image/png", buffer: png }), ".png");
+    assert.equal(getSupportedImageExtension({ mimetype: "image/webp", buffer: webp }), ".webp");
+    assert.equal(getSupportedImageExtension({ mimetype: "image/png", buffer: jpeg }), null);
+    assert.equal(getSupportedImageExtension({ mimetype: "image/jpeg", buffer: png }), null);
+    assert.equal(getSupportedImageExtension({ mimetype: "image/svg+xml", buffer: Buffer.from("<svg/>") }), null);
+    assert.equal(getSupportedImageExtension(undefined), null);
 });
 
 test("notification model validates recipient, appointment, and event type", async () => {
