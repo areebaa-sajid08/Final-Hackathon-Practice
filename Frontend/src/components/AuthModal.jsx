@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../lib/api.js";
 import Icon from "./Icon.jsx";
+import PasswordInput from "./PasswordInput.jsx";
 
 export default function AuthModal({ mode: initialMode = "login", onClose, onSuccess }) {
     const [mode, setMode] = useState(initialMode);
@@ -59,7 +60,7 @@ export default function AuthModal({ mode: initialMode = "login", onClose, onSucc
                     </label>
                     <label className="field">
                         <span>Password</span>
-                        <input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={form.password} onChange={updateField} required minLength={8} maxLength={128} placeholder="At least 8 characters" />
+                        <PasswordInput name="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={form.password} onChange={updateField} required minLength={8} maxLength={128} placeholder="At least 8 characters" />
                     </label>
                     {error && <p className="form-error" role="alert">{error}</p>}
                     <button className="button button-primary button-wide" type="submit" disabled={busy}>

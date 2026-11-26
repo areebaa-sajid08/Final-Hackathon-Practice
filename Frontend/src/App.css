@@ -2032,6 +2032,53 @@ button {
   font-weight: 400;
 }
 
+.password-input-wrap {
+  position: relative;
+  display: block;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #dfe9e2;
+  border-radius: 9px;
+  padding: 0 43px 0 11px;
+  color: #385347;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.password-input-wrap input:focus {
+  border-color: #79aa8d;
+  outline: 3px solid rgba(54, 139, 113, 0.14);
+}
+
+.password-visibility-toggle {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 7px;
+  color: #82958a;
+  background: transparent;
+}
+
+.password-visibility-toggle:hover {
+  color: #34745a;
+  background: #edf5ef;
+}
+
+.password-visibility-toggle:focus-visible {
+  outline: 2px solid #79aa8d;
+  outline-offset: 1px;
+}
+
 .field input::placeholder,
 .field textarea::placeholder {
   color: #a3afa9;

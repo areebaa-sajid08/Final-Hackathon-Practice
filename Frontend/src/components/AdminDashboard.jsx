@@ -3,6 +3,7 @@ import { api } from "../lib/api.js";
 import { doctorDisplayName } from "../lib/format.js";
 import Icon from "./Icon.jsx";
 import LoadingIndicator from "./LoadingIndicator.jsx";
+import PasswordInput from "./PasswordInput.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -185,7 +186,7 @@ export default function AdminDashboard({ user, section }) {
                             <form className="doctor-form-grid" onSubmit={createDoctor}>
                                 <label className="field"><span>Full name</span><input value={doctorForm.name} onChange={event => setDoctorForm(current => ({ ...current, name: event.target.value }))} required maxLength={100} /></label>
                                 <label className="field"><span>Email</span><input type="email" value={doctorForm.email} onChange={event => setDoctorForm(current => ({ ...current, email: event.target.value }))} required /></label>
-                                <label className="field"><span>Temporary password</span><input type="password" value={doctorForm.password} onChange={event => setDoctorForm(current => ({ ...current, password: event.target.value }))} required minLength={8} maxLength={128} /></label>
+                                <label className="field"><span>Temporary password</span><PasswordInput value={doctorForm.password} onChange={event => setDoctorForm(current => ({ ...current, password: event.target.value }))} required minLength={8} maxLength={128} autoComplete="new-password" /></label>
                                 <label className="field"><span>Specialization</span><input value={doctorForm.specialization} onChange={event => setDoctorForm(current => ({ ...current, specialization: event.target.value }))} required maxLength={100} placeholder="e.g. Cardiology" /></label>
                                 <label className="field"><span>Years of experience</span><input type="number" min="0" max="80" step="1" value={doctorForm.experience} onChange={event => setDoctorForm(current => ({ ...current, experience: event.target.value }))} required /></label>
                                 <fieldset className="field days-field">
