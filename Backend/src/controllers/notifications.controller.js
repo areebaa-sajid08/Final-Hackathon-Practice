@@ -30,6 +30,22 @@ export async function markNotificationRead(req, res) {
     return res.status(200).json({ notification });
 }
 
+export async function deleteNotification(req, res) {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({ message: "Invalid notification id" });
+    }
+
+    const notification = await notificationModel.findOneAndDelete({
+        _id: req.params.id,
+        recipient: req.user.id
+    });
+    if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+    }
+
+    return res.status(200).json({ message: "Notification deleted" });
+}
+
 export async function markAllNotificationsRead(req, res) {
     const result = await notificationModel.updateMany(
         { recipient: req.user.id, readAt: null },

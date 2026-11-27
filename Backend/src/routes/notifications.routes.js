@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    deleteNotification,
     getMyNotifications,
     markAllNotificationsRead,
     markNotificationRead
@@ -12,5 +13,6 @@ router.use(authenticateToken);
 router.get("/", getMyNotifications);
 router.patch("/read-all", markAllNotificationsRead);
 router.patch("/:id/read", markNotificationRead);
+router.delete("/:id", deleteNotification);
 
 export default router;

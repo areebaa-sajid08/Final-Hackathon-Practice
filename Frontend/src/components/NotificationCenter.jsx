@@ -17,6 +17,7 @@ function getNotificationIcon(type) {
 export default function NotificationCenter({ inline = false, onOpenAppointments }) {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [deletingIds, setDeletingIds] = useState(() => new Set());
     const [open, setOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
@@ -80,6 +81,28 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
         }
     }
 
+    async function deleteNotification(notification) {
+        if (deletingIds.has(notification._id)) return;
+
+        setError("");
+        setDeletingIds(current => new Set(current).add(notification._id));
+        try {
+            await api.delete(`/notifications/${notification._id}`);
+            setNotifications(current => current.filter(item => item._id !== notification._id));
+            if (!notification.readAt) {
+                setUnreadCount(current => Math.max(0, current - 1));
+            }
+        } catch (requestError) {
+            setError(requestError.message);
+        } finally {
+            setDeletingIds(current => {
+                const next = new Set(current);
+                next.delete(notification._id);
+                return next;
+            });
+        }
+    }
+
     return (
         <div className={`relative ${inline ? "w-full" : ""}`}>
             {!inline && (
@@ -137,24 +160,37 @@ export default function NotificationCenter({ inline = false, onOpenAppointments 
                     ) : (
                         <div className="grid max-h-96 gap-2 overflow-y-auto p-3">
                             {notifications.map(notification => (
-                                <button
-                                    className={`grid w-full grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 text-left transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:shadow-black/20 ${notification.readAt ? "border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900" : "border-emerald-100 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/50"}`}
+                                <div
+                                    className={`grid grid-cols-[minmax(0,1fr)_2.25rem] items-start gap-1 rounded-2xl border p-2 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:shadow-black/20 ${notification.readAt ? "border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900" : "border-emerald-100 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/50"}`}
                                     key={notification._id}
-                                    type="button"
-                                    onClick={() => openNotification(notification)}
                                 >
-                                    <span className={`grid size-10 place-items-center rounded-xl ${notification.type === "appointment_declined" ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300" : notification.type === "appointment_approved" ? "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300" : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"}`}>
-                                        <Icon name={getNotificationIcon(notification.type)} size={16} />
-                                    </span>
-                                    <span className="grid min-w-0 gap-1.5">
-                                        <span className="flex items-center justify-between gap-2 text-xs font-bold text-emerald-950 dark:text-slate-100">
-                                            {notification.title}
-                                            {!notification.readAt && <span className="rounded-full bg-emerald-700 px-2 py-0.5 text-[8px] tracking-wide text-white">NEW</span>}
+                                    <button
+                                        className="grid w-full grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-3 rounded-xl p-1 text-left"
+                                        type="button"
+                                        onClick={() => openNotification(notification)}
+                                    >
+                                        <span className={`grid size-10 place-items-center rounded-xl ${notification.type === "appointment_declined" ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300" : notification.type === "appointment_approved" ? "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300" : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"}`}>
+                                            <Icon name={getNotificationIcon(notification.type)} size={16} />
                                         </span>
-                                        <span className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{notification.message}</span>
-                                        <span className="text-[10px] text-slate-400">{formatCreatedAt(notification.createdAt)}</span>
-                                    </span>
-                                </button>
+                                        <span className="grid min-w-0 gap-1.5">
+                                            <span className="flex items-center justify-between gap-2 text-xs font-bold text-emerald-950 dark:text-slate-100">
+                                                {notification.title}
+                                                {!notification.readAt && <span className="rounded-full bg-emerald-700 px-2 py-0.5 text-[8px] tracking-wide text-white">NEW</span>}
+                                            </span>
+                                            <span className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{notification.message}</span>
+                                            <span className="text-[10px] text-slate-400">{formatCreatedAt(notification.createdAt)}</span>
+                                        </span>
+                                    </button>
+                                    <button
+                                        className="grid size-9 place-items-center rounded-xl text-slate-400 transition hover:bg-rose-100 hover:text-rose-700 disabled:cursor-wait disabled:opacity-50 dark:hover:bg-rose-950 dark:hover:text-rose-300"
+                                        type="button"
+                                        aria-label={`Delete notification: ${notification.title}`}
+                                        disabled={deletingIds.has(notification._id)}
+                                        onClick={() => deleteNotification(notification)}
+                                    >
+                                        <Icon name="close" size={16} />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     )}
